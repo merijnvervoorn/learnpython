@@ -3,12 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Python Dojo - The Path of Code</title>
+    
+    <!-- Primary Meta Tags -->
+    <title>Python Dojo</title>
+    <meta name="title" content="Python Dojo - The Path of Code | Learn Python Through 30 Dojo-Inspired Scrolls">
+    <meta name="description" content="Journey from nameless wanderer to Python master through 30 story-driven lessons (Scrolls). Fight Shadow Spirits, decode ancient scrolls, and forge functions in this browser-based zen martial arts coding dojo. Learn variables, loops, dictionaries, classes & more with instant feedback.">
+    <meta name="keywords" content="Python tutorial, learn Python from scratch, interactive Python, story-based coding, gamified learning, Python for beginners, browser Python, Pyodide, zen dojo, coding journey, Python functions, Python classes, Python lists, zen programming">
+    <meta name="author" content="Python Dojo">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://merijnvervoorn.com/learnpython">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://merijnvervoorn.com/learnpython">
+    <meta property="og:title" content="Python Dojo - Journey from Wanderer to Master">
+    <meta property="og:description" content="Learn Python through 30 dojo-inspired lessons (Scrolls). Fight enemies, decode scrolls, and master Python from variables to classes. No copy-paste allowed - only active creation.">
+    <meta property="og:image" content="https://merijnvervoorn.com/learnpython/favi.png">
+    <meta property="og:site_name" content="Python Dojo">
+    <meta property="og:locale" content="en_US">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://merijnvervoorn.com/learnpython">
+    <meta name="twitter:title" content="Python Dojo - 30 Scrolls from First Step to Mastery">
+    <meta name="twitter:description" content="Journey through a zen martial arts coding dojo. Battle Shadow Spirits with if-statements, organize your inventory with lists, and forge functions. Built with Pyodide for instant browser execution.">
+    <meta name="twitter:image" content="https://merijnvervoorn.com/learnpython/favi.png">
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" href="favi.png">
+    <link rel="apple-touch-icon" href="favi.png">
+    
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Course",
+      "name": "Python Dojo - The Path of Code",
+      "description": "Interactive Python programming course with 30 progressive lessons (Scrolls) teaching from basic variables to advanced classes through a dojo martial arts narrative",
+      "provider": {
+        "@type": "Organization",
+        "name": "Python Dojo"
+      },
+      "educationalLevel": "Beginner to Intermediate",
+      "coursePrerequisites": "None - starts from absolute basics",
+      "numberOfLessons": "30",
+      "teaches": [
+        "Python variables and data types",
+        "String methods and manipulation",
+        "Conditional statements (if/else)",
+        "Lists and list methods",
+        "For loops and iteration",
+        "Dictionaries and key-value pairs",
+        "Functions and return values",
+        "Modules and imports",
+        "Classes and object-oriented programming",
+        "Error handling with try/except",
+        "List comprehensions",
+        "String slicing and formatting",
+        "File operations",
+        "Lambda functions",
+        "Advanced data structures"
+      ],
+      "inLanguage": "en",
+      "isAccessibleForFree": true,
+      "url": "https://merijnvervoorn.com/learnpython"
+    }
+    </script>
+    
     <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     
     <style>
-        /* --- CLAUDE'S ZEN DESIGN --- */
         :root {
             --tatami-tan: #d4c5a0;
             --tatami-dark: #b8a881;
@@ -48,9 +113,20 @@
 
         .dojo-container { max-width: 900px; margin: 0 auto; position: relative; z-index: 2; }
 
+        .dojo-icon-corner {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            z-index: 100;
+        }
+
         .dojo-frame {
             background: var(--wood-dark); padding: 8px; border-radius: 4px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.1);
+            position: relative;
         }
 
         .dojo-content {
@@ -98,16 +174,16 @@
             min-height: 40px;
         }
 
-        /* LESSON BOX */
-        .lesson-box {
+        /* Scroll BOX */
+        .Scroll-box {
             background: linear-gradient(to right, rgba(212, 121, 60, 0.08), transparent);
             border-left: 6px solid var(--persimmon); padding: 25px 30px; margin-bottom: 30px; position: relative;
         }
-        .lesson-box h3 { color: var(--persimmon-deep); font-size: 1.5rem; margin-bottom: 15px; font-weight: 600; }
-        .lesson-box p { line-height: 1.8; margin-bottom: 15px; color: var(--ink); }
-        .lesson-box ul { list-style: none; padding-left: 0; }
-        .lesson-box li { padding: 5px 0 5px 25px; position: relative; line-height: 1.6; }
-        .lesson-box li::before { content: '▸'; position: absolute; left: 0; color: var(--persimmon); font-weight: bold; }
+        .Scroll-box h3 { color: var(--persimmon-deep); font-size: 1.5rem; margin-bottom: 15px; font-weight: 600; }
+        .Scroll-box p { line-height: 1.8; margin-bottom: 15px; color: var(--ink); }
+        .Scroll-box ul { list-style: none; padding-left: 0; }
+        .Scroll-box li { padding: 5px 0 5px 25px; position: relative; line-height: 1.6; }
+        .Scroll-box li::before { content: '▸'; position: absolute; left: 0; color: var(--persimmon); font-weight: bold; }
 
         code { background: rgba(212, 121, 60, 0.15); color: var(--persimmon-deep); padding: 2px 6px; border-radius: 3px; font-family: 'Fira Code', monospace; font-size: 0.9em; font-weight: 500; }
 
@@ -221,6 +297,7 @@
     </style>
 </head>
 <body>
+    <img src="favi.png" alt="Dojo Icon" class="dojo-icon-corner">
     <div class="dojo-container">
         <div class="dojo-frame">
             <div class="dojo-content">
@@ -237,7 +314,7 @@
 
                 <div id="zen-bar">⛩ Preparing the dojo...</div>
 
-                <div class="lesson-box" id="lesson-content"></div>
+                <div class="Scroll-box" id="Scroll-content"></div>
 
                 <div class="editor-section">
                     <div class="editor-label">
@@ -324,7 +401,7 @@
         // --- LEVEL DATA ---
         const LEVELS = {
             1: {
-                title: "Lesson 1: The First Step",
+                title: "Scroll 1: The First Step",
                 description: "Welcome, student. Every master was once a beginner. To walk the path, you must first announce your presence.",
                 tasks: [
                     "Create a variable named <code>hero_name</code> containing your name (String).",
@@ -350,7 +427,7 @@
                 }
             },
             2: {
-                title: "Lesson 2: The Merchant",
+                title: "Scroll 2: The Merchant",
                 description: "Before you leave, you must buy equipment. In Python, we use math to calculate costs. <br><br><strong>Items for sale:</strong><br> - Bokken (Sword): 15 Gold<br> - Gi (Uniform): 20.5 Gold",
                 tasks: [
                     "Create a variable <code>gold</code> with value <code>50</code> (Integer).",
@@ -384,7 +461,7 @@
                 }
             },
             3: {
-                title: "Lesson 3: The Decryption",
+                title: "Scroll 3: The Decryption",
                 description: "A messenger has arrived with a scroll, but the text is messy. You must use Python's <strong>String Methods</strong> to clean it up.<br><br>Methods are tools attached to objects. For example: <code>text.upper()</code> converts text to uppercase.",
                 tasks: [
                     "Create a variable <code>message</code> with the string <code>\"  danger comes  \"</code> (note the spaces).",
@@ -417,7 +494,7 @@
                 }
             },
             4: {
-                title: "Lesson 4: The Gatekeeper",
+                title: "Scroll 4: The Gatekeeper",
                 description: "The warning was true! A <strong>Shadow Spirit</strong> blocks the path. A warrior does not swing blindly; they judge the situation.<br><br>Use <strong>If/Else</strong> logic. If your power is greater than the enemy, you attack. Otherwise, you retreat.",
                 tasks: [
                     "Create variable <code>my_power</code> set to <code>50</code>.",
@@ -466,7 +543,7 @@
                 }
             },
             5: {
-                title: "Lesson 5: The Inventory",
+                title: "Scroll 5: The Inventory",
                 description: "You retreated safely, but your gear is a mess. You must organize your <strong>List</strong> of supplies to survive the next attempt.<br><br>Lists are ordered collections using square brackets `[]`.<br>Ex: <code>items = [\"A\", \"B\"]</code>",
                 tasks: [
                     "Create a list named <code>backpack</code> containing strings: <code>\"Rope\"</code>, <code>\"Map\"</code>, and <code>\"Bread\"</code>.",
@@ -516,7 +593,7 @@
                 }
             },
             6: {
-                title: "Lesson 6: The Training Yard",
+                title: "Scroll 6: The Training Yard",
                 description: "Before you face the boss, you must prove your stamina. A warrior does not strike once; they strike until the job is done.<br><br>Use a <strong>For Loop</strong> to repeat an action for every item in a list.<br>Syntax: <code>for item in list:</code> (Don't forget the indent!)",
                 tasks: [
                     "Create a list <code>enemies</code> containing: <code>\"Goblin\"</code>, <code>\"Orc\"</code>, and <code>\"Slime\"</code>.",
@@ -568,7 +645,7 @@
                 }
             },
             7: {
-                title: "Lesson 7: The Archive",
+                title: "Scroll 7: The Archive",
                 description: "Brute force will not work on high-level demons. You must know their weaknesses.<br><br>Use a <strong>Dictionary</strong> to map specific keys to values.<br>Syntax: <code>data = {\"Key\": \"Value\"}</code> (Use curly braces!)",
                 tasks: [
                     "Create a dictionary named <code>bestiary</code>.",
@@ -625,7 +702,7 @@
                 }
             },
             8: {
-                title: "Lesson 8: The Technique",
+                title: "Scroll 8: The Technique",
                 description: "You find yourself casting the same spell repeatedly. A master does not rewrite the scroll every time; they create a <strong>Function</strong>.<br><br>Functions are reusable blocks of code.<br>Syntax:<br><code>def my_function():</code><br>&nbsp;&nbsp;&nbsp;&nbsp;<code># code here</code><br><br>To use it, you must <strong>Call</strong> it: <code>my_function()</code>",
                 tasks: [
                     "Define a function named <code>cast_fire</code> using <code>def</code>.",
@@ -671,7 +748,7 @@
                 }
             },
             9: {
-                title: "Lesson 9: The Precision Strike",
+                title: "Scroll 9: The Precision Strike",
                 description: "A blind swing is foolish. You must adjust your force based on the target. Functions accept <strong>Arguments</strong> (inputs) and can send back a <strong>Return Value</strong> (output).<br><br>Syntax:<br><code>def add(a, b):</code><br>&nbsp;&nbsp;&nbsp;&nbsp;<code>return a + b</code>",
                 tasks: [
                     "Define a function <code>calculate_damage</code> that accepts two arguments: <code>base</code> and <code>bonus</code>.",
@@ -734,7 +811,7 @@
                 }
             },
             10: {
-                title: "Lesson 10: The Alliance",
+                title: "Scroll 10: The Alliance",
                 description: "You cannot forge every blade yourself. A master knows when to call upon the Ancients.<br><br>Python has a vast library of scrolls called <strong>Modules</strong>. To use them, you must <code>import</code> them.<br>Example: <code>import random</code> gives you access to <code>random.randint(a, b)</code>.",
                 tasks: [
                     "Write <code>import random</code> at the top of your scroll.",
@@ -789,7 +866,7 @@
                 }
             },
             11: {
-                title: "Lesson 11: The Blueprint",
+                title: "Scroll 11: The Blueprint",
                 description: "You have used tools, but now you must create life. A <strong>Class</strong> is a blueprint for creating Objects. It defines what a thing *is*.<br><br>Syntax:<br><code>class Hero:</code><br>&nbsp;&nbsp;&nbsp;&nbsp;<code>def __init__(self, name):</code><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>self.name = name</code>",
                 tasks: [
                     "Define a class named <code>Hero</code>.",
@@ -839,7 +916,7 @@
                 }
             },
             12: {
-                title: "Lesson 12: The Unseen Trap",
+                title: "Scroll 12: The Unseen Trap",
                 description: "The path is not always clear. Sometimes, the numbers betray you. A master does not fear errors; they <strong>Catch</strong> them.<br><br>Use <code>try</code> and <code>except</code> to handle crashes safely.<br>Syntax:<br><code>try:</code><br>&nbsp;&nbsp;&nbsp;&nbsp;<code># risky code</code><br><code>except ZeroDivisionError:</code><br>&nbsp;&nbsp;&nbsp;&nbsp;<code># rescue code</code>",
                 tasks: [
                     "Create variable <code>gold</code> = <code>100</code> and <code>party</code> = <code>0</code>.",
@@ -951,7 +1028,7 @@ test_dmg = test_ghost.strike()
                 }
             },
             14: {
-                title: "Lesson 14: The Thousand-Fold Strike",
+                title: "Scroll 14: The Thousand-Fold Strike",
                 description: "You enter the Hall of Multiples. A novice strikes one target at a time. A master strikes them all at once. <br><br><strong>Numpy</strong> allows 'Vectorized' movement—applying one action to an entire array instantly.<br>1. <code>import numpy as np</code><br>2. Create array: <code>arr = np.array([1, 2, 3])</code><br>3. Multiply the array by 2.",
                 tasks: [
                     "Import <code>numpy</code> as <code>np</code>.",
@@ -994,7 +1071,7 @@ test_dmg = test_ghost.strike()
                 }
             },
             15: {
-                title: "Lesson 15: The Grand Archive",
+                title: "Scroll 15: The Grand Archive",
                 description: "To understand the world outside the dojo, you must organize it. We use <strong>Pandas</strong> to create a 'DataFrame'—a sacred scroll of rows and columns.<br><br>1. <code>import pandas as pd</code><br>2. Create data: <code>data = {\"Col1\": [1, 2], \"Col2\": [3, 4]}</code><br>3. Create DataFrame: <code>df = pd.DataFrame(data)</code><br>4. Check dimensions: <code>df.shape</code>",
                 tasks: [
                     "Import <code>pandas</code> as <code>pd</code>.",
@@ -1040,7 +1117,7 @@ test_dmg = test_ghost.strike()
                 }
             },
             16: {
-                title: "Lesson 16: The Precision Cut",
+                title: "Scroll 16: The Precision Cut",
                 description: "A warrior does not swing blindly at the crowd. You must strike the pressure point. We use <strong>.loc</strong> to target specific data in the DataFrame.<br><br>Syntax: <code>df.loc[row_index, \"ColumnName\"]</code>",
                 tasks: [
                     "Import pandas as pd.",
@@ -1078,7 +1155,7 @@ test_dmg = test_ghost.strike()
                 }
             },
             17: {
-                title: "Lesson 17: The Faded Ink",
+                title: "Scroll 17: The Faded Ink",
                 description: "The ancient scrolls are damaged. Some techniques are missing (NaN - Not a Number). A master does not guess; they identify the void.<br><br>Use <code>.isnull()</code> to find the gaps in the data.",
                 tasks: [
                     "Import pandas and numpy (<code>import numpy as np</code>).",
@@ -1125,7 +1202,7 @@ test_dmg = test_ghost.strike()
                 }
             },
             18: {
-                title: "Lesson 18: The Painter's Eye",
+                title: "Scroll 18: The Painter's Eye",
                 description: "Numbers are cold. To see the flow of Qi, you must visualize it. We use <strong>Matplotlib</strong> to draw the currents of energy.<br><br>1. <code>import matplotlib.pyplot as plt</code><br>2. <code>plt.plot(x_list, y_list)</code><br>3. <code>plt.show()</code>",
                 tasks: [
                     "Import <code>matplotlib.pyplot</code> as <code>plt</code>.",
@@ -1157,7 +1234,7 @@ test_dmg = test_ghost.strike()
                 }
             },
             19: {
-                title: "Lesson 19: The Oracle's Summary",
+                title: "Scroll 19: The Oracle's Summary",
                 description: "You have thousands of scrolls. You cannot read them one by one. You need the Oracle's Vision to see the whole picture at once.<br><br>Use <strong>.describe()</strong> to get a summary (Count, Mean, Min, Max) of your dataframe.",
                 tasks: [
                     "Import pandas as pd.",
@@ -1200,7 +1277,7 @@ test_dmg = test_ghost.strike()
                 }
             },
             20: {
-                title: "Lesson 20: The Archer's Paradox",
+                title: "Scroll 20: The Archer's Paradox",
                 description: "Two archers can have the same average score, yet one is a master and one is a fool. We measure consistency using <strong>Standard Deviation (.std)</strong>.<br><br>Low Std Dev = Precision (Mastery).<br>High Std Dev = Chaos (Luck).",
                 tasks: [
                     "Import pandas as pd.",
@@ -1236,7 +1313,7 @@ test_dmg = test_ghost.strike()
                 }
             },
             21: {
-                title: "Lesson 21: The Outlier",
+                title: "Scroll 21: The Outlier",
                 description: "Who is the Chosen One? Who is the traitor? To find them, we measure how far they stand from the crowd using the <strong>Z-Score</strong>.<br><br>Formula: Z = (Value - Mean) / StdDev.",
                 tasks: [
                     "Import pandas as pd.",
@@ -1273,7 +1350,7 @@ test_dmg = test_ghost.strike()
                 }
             },
             22: {
-                title: "Lesson 22: The Invisible Link",
+                title: "Scroll 22: The Invisible Link",
                 description: "Does meditation increase power? Does rain cause defeat? We measure the connection between two forces using <strong>Correlation (.corr)</strong>.<br><br>1.0 = Perfect Link.<br>0.0 = No Link.<br>-1.0 = Opposite Link.",
                 tasks: [
                     "Import pandas as pd.",
@@ -1363,7 +1440,7 @@ test_dmg = test_ghost.strike()
                 }
             },
             24: {
-                title: "Lesson 24: The Test of Two Steels",
+                title: "Scroll 24: The Test of Two Steels",
                 description: "Two swordsmiths claim to forge the sharpest blade. The 'Masamune' feels lighter, but the 'Muramasa' cuts deeper. A master does not guess; they measure the cut.<br><br>Use the <strong>T-Test</strong> to see if the difference is real (Significant) or just chance.<br>If <strong>P-Value < 0.05</strong>, the difference is real.",
                 tasks: [
                     "Import <code>ttest_ind</code> from <code>scipy.stats</code>.",
@@ -1409,7 +1486,7 @@ test_dmg = test_ghost.strike()
                 }
             },
             25: {
-                title: "Lesson 25: The Archer's Zen",
+                title: "Scroll 25: The Archer's Zen",
                 description: "A novice watches the arrow fly. A master knows where it lands before drawing the string. <br><br>We use <strong>Linear Regression</strong> to predict the impact based on the draw weight. <br>1. <code>from sklearn.linear_model import LinearRegression</code><br>2. <code>model = LinearRegression()</code><br>3. <code>model.fit(X, y)</code> (Meditate on the pattern)<br>4. <code>model.predict(new_X)</code> (Foresee the outcome)",
                 tasks: [
                     "Import <code>LinearRegression</code> from <code>sklearn.linear_model</code>.",
@@ -1448,7 +1525,7 @@ test_dmg = test_ghost.strike()
                 }
             },
             26: {
-                title: "Lesson 26: The Essence of the Mantra",
+                title: "Scroll 26: The Essence of the Mantra",
                 description: "The students are chanting, but their voices are a blur. To understand the spirit of the dojo, you must deconstruct their words into pure numbers.<br><br>This is <strong>NLP</strong>. We use <strong>CountVectorizer</strong> to turn mantras into a matrix of word counts.",
                 tasks: [
                     "Import <code>CountVectorizer</code> from <code>sklearn.feature_extraction.text</code>.",
@@ -1484,7 +1561,7 @@ test_dmg = test_ghost.strike()
                 }
             },
             27: {
-                title: "Lesson 27: The Shadow at the Gate",
+                title: "Scroll 27: The Shadow at the Gate",
                 description: "A silhouette stands at the Dojo gate. Friend or Foe? A novice guesses; a Seer calculates.<br><br>We use <strong>Logistic Regression</strong> for Classification (Yes/No).<br>1. <code>from sklearn.linear_model import LogisticRegression</code><br>2. <code>model = LogisticRegression()</code><br>3. <code>model.fit(X, y)</code> (0=Friend, 1=Enemy)<br>4. <code>model.predict(new_X)</code>",
                 tasks: [
                     "Import <code>LogisticRegression</code> from <code>sklearn.linear_model</code>.",
@@ -1521,7 +1598,7 @@ test_dmg = test_ghost.strike()
                 }
             },
             28: {
-                title: "Lesson 28: The Constellations of War",
+                title: "Scroll 28: The Constellations of War",
                 description: "Warriors are camped in the valley below. They hide their banners, but their positions betray them. They are clustered into two distinct clans.<br><br>We use <strong>K-Means Clustering</strong> to find hidden groups.<br>1. <code>from sklearn.cluster import KMeans</code><br>2. <code>kmeans = KMeans(n_clusters=2)</code><br>3. <code>kmeans.fit(X)</code><br>4. Labels are found in <code>kmeans.labels_</code>",
                 tasks: [
                     "Import <code>KMeans</code> from <code>sklearn.cluster</code>.",
@@ -2039,6 +2116,9 @@ test_dmg = test_ghost.strike()
         function loadLevelUI() {
             const levelData = LEVELS[currentLevel];
             
+            // Update page title with current level
+            document.title = `Python Dojo | Scroll ${currentLevel}: ${levelData.title.replace('Scroll ' + currentLevel + ': ', '')}`;
+            
             // New Quote on Level Change
             displayRandomQuote();
 
@@ -2047,7 +2127,7 @@ test_dmg = test_ghost.strike()
             document.getElementById("btn-submit").style.display = "inline-block";
 
             let taskList = levelData.tasks.map(t => `<li>${t}</li>`).join("");
-            document.getElementById("lesson-content").innerHTML = `
+            document.getElementById("Scroll-content").innerHTML = `
                 <h3>${levelData.title}</h3>
                 <p>${levelData.description}</p>
                 <ul>${taskList}</ul>
