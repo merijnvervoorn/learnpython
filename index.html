@@ -1,52 +1,2223 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>My Python Gym</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Dojo - The Path of Code</title>
     <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
     <style>
-        body { font-family: monospace; padding: 20px; max-width: 800px; margin: auto; }
-        textarea { width: 100%; height: 150px; background: #f4f4f4; border: 1px solid #ccc; padding: 10px; }
-        button { padding: 10px 20px; background: #333; color: #fff; cursor: pointer; border: none; margin-top: 10px;}
-        #output { background: #eee; padding: 10px; margin-top: 20px; border-left: 5px solid #333; min-height: 50px;}
+        /* --- CLAUDE'S ZEN DESIGN --- */
+        :root {
+            --tatami-tan: #d4c5a0;
+            --tatami-dark: #b8a881;
+            --wood-dark: #3d2817;
+            --wood-medium: #6b4423;
+            --wood-light: #8b5a2b;
+            --persimmon: #d4793c;
+            --persimmon-deep: #b85c28;
+            --cream: #faf6f0;
+            --paper: #f5f2ea;
+            --ink: #2a2520;
+            --bamboo-green: #558b2f;
+            --bamboo-light: #7cb342;
+            --danger-red: #8b0000;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: linear-gradient(135deg, var(--tatami-tan) 0%, var(--tatami-dark) 100%);
+            font-family: 'Noto Serif JP', serif;
+            color: var(--ink);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Tatami Texture */
+        body::before {
+            content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.02) 2px, rgba(0,0,0,0.02) 3px),
+                repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(0,0,0,0.03) 40px, rgba(0,0,0,0.03) 41px);
+            pointer-events: none; z-index: 1;
+        }
+
+        .dojo-container { max-width: 900px; margin: 0 auto; position: relative; z-index: 2; }
+
+        .dojo-frame {
+            background: var(--wood-dark); padding: 8px; border-radius: 4px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.1);
+        }
+
+        .dojo-content {
+            background: var(--cream); padding: 40px; position: relative;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.05);
+        }
+
+        /* Corners */
+        .corner-accent { position: absolute; width: 60px; height: 60px; border: 3px solid var(--persimmon); opacity: 0.6; pointer-events: none;}
+        .corner-accent.top-left { top: 15px; left: 15px; border-right: none; border-bottom: none; }
+        .corner-accent.top-right { top: 15px; right: 15px; border-left: none; border-bottom: none; }
+        .corner-accent.bottom-left { bottom: 15px; left: 15px; border-right: none; border-top: none; }
+        .corner-accent.bottom-right { bottom: 15px; right: 15px; border-left: none; border-top: none; }
+
+        header { text-align: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 3px solid var(--persimmon); position: relative; }
+        h1 { font-size: 3rem; font-weight: 600; color: var(--wood-dark); margin-bottom: 10px; letter-spacing: 4px; text-shadow: 2px 2px 0 rgba(212, 121, 60, 0.2); }
+        .subtitle { font-size: 1.1rem; color: var(--wood-medium); letter-spacing: 3px; }
+
+        /* MANIFESTO BUTTON */
+        .btn-manifesto {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: transparent;
+            border: 2px solid var(--wood-medium);
+            color: var(--wood-medium);
+            padding: 5px 10px;
+            font-family: 'Noto Serif JP', serif;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+        .btn-manifesto:hover { background: var(--wood-medium); color: var(--cream); }
+
+        /* THE ZEN QUOTE BAR */
+        #zen-bar { 
+            text-align: center; 
+            padding: 10px; 
+            margin-bottom: 30px; 
+            font-style: italic;
+            color: var(--wood-medium);
+            background: rgba(212, 121, 60, 0.05);
+            border-radius: 4px;
+            min-height: 40px;
+        }
+
+        /* LESSON BOX */
+        .lesson-box {
+            background: linear-gradient(to right, rgba(212, 121, 60, 0.08), transparent);
+            border-left: 6px solid var(--persimmon); padding: 25px 30px; margin-bottom: 30px; position: relative;
+        }
+        .lesson-box h3 { color: var(--persimmon-deep); font-size: 1.5rem; margin-bottom: 15px; font-weight: 600; }
+        .lesson-box p { line-height: 1.8; margin-bottom: 15px; color: var(--ink); }
+        .lesson-box ul { list-style: none; padding-left: 0; }
+        .lesson-box li { padding: 5px 0 5px 25px; position: relative; line-height: 1.6; }
+        .lesson-box li::before { content: '▸'; position: absolute; left: 0; color: var(--persimmon); font-weight: bold; }
+
+        code { background: rgba(212, 121, 60, 0.15); color: var(--persimmon-deep); padding: 2px 6px; border-radius: 3px; font-family: 'Fira Code', monospace; font-size: 0.9em; font-weight: 500; }
+
+        /* EDITOR */
+        .editor-label { background: var(--wood-medium); color: var(--cream); padding: 12px 20px; font-weight: 600; letter-spacing: 1px; border-radius: 4px 4px 0 0; display: flex; justify-content: space-between; }
+        .save-status { font-size: 0.8rem; opacity: 0.8; font-weight: normal; }
+        .editor-wrapper { background: var(--wood-dark); padding: 4px; border-radius: 0 0 4px 4px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.3); }
+        textarea {
+            width: 100%; height: 280px; background: #1e1e1e; color: #d4d4d4;
+            font-family: 'Fira Code', monospace; font-size: 1rem; border: none; padding: 20px; outline: none; resize: vertical; line-height: 1.6;
+        }
+
+        /* SUBMIT BUTTON */
+        .button-wrapper { 
+            text-align: center; 
+            margin: 30px 0; 
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, var(--persimmon) 0%, var(--persimmon-deep) 100%);
+            color: var(--cream); font-family: 'Noto Serif JP', serif; font-weight: 600; font-size: 1.3rem; letter-spacing: 2px;
+            border: none; padding: 18px 50px; cursor: pointer; border-radius: 4px; transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(212, 121, 60, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+            width: 100%; max-width: 400px;
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(212, 121, 60, 0.5), inset 0 1px 0 rgba(255,255,255,0.3); }
+
+        /* OUTPUT */
+        .output-label { background: var(--wood-medium); color: var(--cream); padding: 12px 20px; font-weight: 600; letter-spacing: 1px; border-radius: 4px 4px 0 0; border-left: 6px solid var(--persimmon); }
+        .ink-output {
+            background: var(--paper); border: 4px solid var(--wood-dark); border-top: none; padding: 25px; min-height: 120px;
+            font-family: 'Fira Code', monospace; white-space: pre-wrap; color: var(--ink); line-height: 1.8;
+            box-shadow: inset 0 4px 12px rgba(0,0,0,0.05); border-radius: 0 0 4px 4px;
+        }
+        .status-pass { border-left: 8px solid var(--bamboo-green); background: linear-gradient(to right, rgba(124, 148, 115, 0.1), var(--paper)); }
+        .status-fail { border-left: 8px solid #c44536; background: linear-gradient(to right, rgba(196, 69, 54, 0.1), var(--paper)); }
+
+        /* NEXT LEVEL CONTAINER */
+        #next-level-container {
+            margin-top: 30px;
+            text-align: center;
+            display: none; /* Hidden by default */
+            animation: fadeIn 1s;
+        }
+
+        /* SQUARE BAMBOO BUTTON (Fixed Hover) */
+        .btn-next {
+            background: linear-gradient(135deg, var(--bamboo-light) 0%, var(--bamboo-green) 100%);
+            color: #fff; 
+            font-family: 'Noto Serif JP', serif; font-weight: 600; font-size: 1.3rem; letter-spacing: 2px;
+            border: 2px solid var(--wood-dark); 
+            padding: 18px 60px; 
+            cursor: pointer; 
+            border-radius: 4px; 
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(85, 139, 47, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+        }
+        .btn-next:hover { 
+            transform: translateY(-2px);
+            /* Fixed: Use filter to brighten instead of changing background to a color */
+            filter: brightness(1.1); 
+            box-shadow: 0 8px 25px rgba(85, 139, 47, 0.6), inset 0 1px 0 rgba(255,255,255,0.3);
+        }
+
+        /* FOOTER */
+        .dojo-footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(107, 68, 35, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+        .dojo-footer:hover { opacity: 1; }
+        
+        .footer-label { font-size: 0.9rem; color: var(--wood-light); margin-right: 10px; }
+        select { padding: 5px 10px; font-family: 'Noto Serif JP', serif; font-size: 0.9rem; border: 1px solid var(--wood-light); background: var(--paper); color: var(--wood-dark); cursor: pointer; border-radius: 4px; }
+        .btn-reset { background: transparent; color: var(--danger-red); border: none; padding: 5px 10px; font-size: 0.8rem; cursor: pointer; font-family: 'Noto Serif JP', serif; text-decoration: underline; }
+        .btn-reset:hover { color: red; }
+
+        /* MODAL */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 100;
+            display: none; justify-content: center; align-items: center;
+        }
+        .modal-content {
+            background: var(--paper); padding: 40px; max-width: 600px; width: 90%;
+            border-radius: 4px; border: 8px solid var(--wood-dark);
+            position: relative;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        }
+        .modal-close {
+            position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer; color: var(--wood-medium);
+        }
+        .modal-content h2 { color: var(--wood-dark); border-bottom: 2px solid var(--persimmon); margin-bottom: 20px; padding-bottom: 10px; }
+        .modal-content p { margin-bottom: 15px; line-height: 1.6; }
+        .modal-content ul { padding-left: 20px; margin-bottom: 20px; }
+        .modal-content li { margin-bottom: 10px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 768px) { 
+            .dojo-content { padding: 20px; } 
+            h1 { font-size: 2rem; } 
+            .dojo-footer { flex-direction: column; gap: 15px; }
+            .btn-manifesto { position: relative; display: block; width: 100%; margin-bottom: 20px; text-align: center; }
+        }
     </style>
 </head>
 <body>
+    <div class="dojo-container">
+        <div class="dojo-frame">
+            <div class="dojo-content">
+                <div class="corner-accent top-left"></div>
+                <div class="corner-accent top-right"></div>
+                <div class="corner-accent bottom-left"></div>
+                <div class="corner-accent bottom-right"></div>
 
-    <h1>Python Gym: Level 1</h1>
-    <p>Challenge: Print "Hello, World!" to the output.</p>
-    
-    <textarea id="code">print("Hello, World!")</textarea>
-    <br>
-    <button onclick="runPython()">Run Code</button>
-    
-    <div id="output"></div>
+                <header>
+                    <button class="btn-manifesto" onclick="toggleModal(true)">📜 The Dojo Rules</button>
+                    <h1>PYTHON DOJO</h1>
+                    <div class="subtitle">道 • The Way of Code</div>
+                </header>
+
+                <div id="zen-bar">⛩ Preparing the dojo...</div>
+
+                <div class="lesson-box" id="lesson-content"></div>
+
+                <div class="editor-section">
+                    <div class="editor-label">
+                        <span>⚡ Your Code Scroll</span>
+                        <span id="save-status" class="save-status"></span>
+                    </div>
+                    <div class="editor-wrapper">
+                        <textarea id="code-editor" spellcheck="false" oninput="saveProgress()"></textarea>
+                    </div>
+                </div>
+
+                <div class="button-wrapper">
+                    <button id="btn-submit" class="btn-submit" onclick="checkCode()">Submit to Sensei</button>
+                </div>
+
+                <div class="output-section">
+                    <div class="output-label">📜 Sensei's Judgment</div>
+                    <div id="console-output" class="ink-output">Awaiting your code...</div>
+                </div>
+
+                <div id="next-level-container">
+                    <button class="btn-next" onclick="goToNextLevel()">Next Scroll ➔</button>
+                </div>
+
+                <div class="dojo-footer">
+                    <div class="level-selector">
+                        <span class="footer-label">Scroll Archive:</span>
+                        <select id="level-select" onchange="changeLevel(this.value)">
+                            </select>
+                    </div>
+                    <button class="btn-reset" onclick="resetProgress()">Burn Scrolls (Reset All)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="rules-modal" class="modal-overlay" onclick="if(event.target === this) toggleModal(false)">
+        <div class="modal-content">
+            <div class="modal-close" onclick="toggleModal(false)">×</div>
+            <h2>The Dojo Manifesto</h2>
+            <p><strong>Why I am here:</strong><br>I realized that relying on AI to write code made me forget the language. I understood the concepts, but lost the muscle memory.</p>
+            <p>This Dojo is my path to re-learning Python from scratch—building true understanding, not just generating output.</p>
+            <hr style="border:0; border-top:1px dashed #ccc; margin: 20px 0;">
+            <h3>The 4 Rules of Discipline</h3>
+            <ul>
+                <li><strong>1. The Architect & The Builder:</strong> AI gives the specs (the "What"), but I must write the code (the "How").</li>
+                <li><strong>2. The 5-Minute Rule:</strong> I must struggle with a problem for at least 5 minutes before asking for a hint.</li>
+                <li><strong>3. No Copy-Paste:</strong> If I find a solution online or via AI, I must type it out manually to reinforce the syntax.</li>
+                <li><strong>4. Active Creation:</strong> I am not a passive reviewer of code; I am an active creator.</li>
+            </ul>
+        </div>
+    </div>
 
     <script>
-        async function main() {
-            // Initialize Pyodide
-            window.pyodide = await loadPyodide();
-            document.getElementById("output").innerText = "Ready! System Loaded.";
+        // --- ZEN WISDOM (Random Quotes) ---
+        const QUOTES = [
+            "Fall down seven times, stand up eight.",
+            "Even dust, if piled up, becomes a mountain.",
+            "The bamboo that bends is stronger than the oak that breaks.",
+            "A journey of a thousand miles begins with a single step.",
+            "Learning is a treasure that will follow its owner everywhere.",
+            "If you do not enter the tiger's cave, you will not catch its cub.",
+            "Be not afraid of going slowly, be afraid only of standing still.",
+            "Experience is the best teacher.",
+            "Discipline will take you places motivation cannot.",
+            "To know and not to do is not yet to know.",
+            "One who smiles rather than rages is always the stronger.",
+            "Persistence pays off.",
+            "Yesterday's flower is today's dream.",
+            "Study the past if you would define the future.",
+            "The rough stone becomes a jewel only through polishing.",
+            "Silence is often the best answer.",
+            "Even monkeys fall from trees (Everyone makes mistakes).",
+            "Ten men, ten colors (Everyone has their own style).",
+            "Wake from death and return to life (Desperate situation turn-around).",
+            "Continuance is power."
+        ];
+
+        function displayRandomQuote() {
+            const quote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+            document.getElementById("zen-bar").innerText = "‟ " + quote + " ”";
         }
 
-        async function runPython() {
-            let code = document.getElementById("code").value;
-            let outputDiv = document.getElementById("output");
-            try {
-                // This is the magic line that runs Python in browser
-                // We redirect stdout to capture 'print' statements
-                pyodide.runPython(`
-import sys
-from io import StringIO
-sys.stdout = StringIO()
-`);
-                await pyodide.runPythonAsync(code);
-                let stdout = pyodide.runPython("sys.stdout.getvalue()");
-                outputDiv.innerText = stdout;
-            } catch (err) {
-                outputDiv.innerText = err;
+        // --- LEVEL DATA ---
+        const LEVELS = {
+            1: {
+                title: "Lesson 1: The First Step",
+                description: "Welcome, student. Every master was once a beginner. To walk the path, you must first announce your presence.",
+                tasks: [
+                    "Create a variable named <code>hero_name</code> containing your name (String).",
+                    "Create a variable named <code>level</code> set to the number <code>1</code> (Integer).",
+                    "Use <code>print()</code> to declare: \"I am ready to learn.\""
+                ],
+                initialCode: "# Write your code here...\n\n",
+                success: "The Dojo registry now bears your name. You are no longer a nameless wanderer. With your Level established at 1, you are weak, but you exist. We may now begin your physical training.",
+                validate: (pyodide, output) => {
+                    let heroName = pyodide.globals.get('hero_name');
+                    let heroLevel = pyodide.globals.get('level');
+                    let errors = []; let passed = true; let feedback = "";
+
+                    if (typeof heroName === 'string' && heroName.length > 0) feedback += "✓ [PASS] Identity confirmed: " + heroName + ".\n";
+                    else { errors.push("✗ [FAIL] You must define 'hero_name' as a String."); passed = false; }
+
+                    if (typeof heroLevel === 'number' && heroLevel === 1) feedback += "✓ [PASS] Level set to 1.\n";
+                    else { errors.push("✗ [FAIL] You must define 'level' as the Integer 1."); passed = false; }
+
+                    if (!output.toLowerCase().includes("ready")) { errors.push("✗ [FAIL] You must print the phrase 'I am ready to learn'."); passed = false; }
+
+                    return { passed, errors, feedback };
+                }
+            },
+            2: {
+                title: "Lesson 2: The Merchant",
+                description: "Before you leave, you must buy equipment. In Python, we use math to calculate costs. <br><br><strong>Items for sale:</strong><br> - Bokken (Sword): 15 Gold<br> - Gi (Uniform): 20.5 Gold",
+                tasks: [
+                    "Create a variable <code>gold</code> with value <code>50</code> (Integer).",
+                    "Create a variable <code>bokken_price</code> with value <code>15</code>.",
+                    "Create a variable <code>gi_price</code> with value <code>20.5</code> (Float).",
+                    "Calculate <code>remaining</code> gold by subtracting prices from gold.",
+                    "Print <code>remaining</code>."
+                ],
+                initialCode: "# You enter the shop...\n\n",
+                success: "The numbers balance like a well-struck chord. You have traded fair value and your inventory is secure. You are finally equipped to survive the wilderness outside.",
+                validate: (pyodide, output) => {
+                    let gold = pyodide.globals.get('gold');
+                    let bokken = pyodide.globals.get('bokken_price');
+                    let gi = pyodide.globals.get('gi_price');
+                    let remaining = pyodide.globals.get('remaining');
+                    let errors = []; let passed = true; let feedback = "";
+
+                    if (gold === 50) feedback += "✓ [PASS] Gold purse is full (50).\n";
+                    else { errors.push("✗ [FAIL] 'gold' should be 50."); passed = false; }
+
+                    if (bokken === 15) feedback += "✓ [PASS] Bokken price is correct.\n";
+                    else { errors.push("✗ [FAIL] 'bokken_price' should be 15."); passed = false; }
+
+                    if (gi === 20.5) feedback += "✓ [PASS] Gi price is correct.\n";
+                    else { errors.push("✗ [FAIL] 'gi_price' should be 20.5."); passed = false; }
+
+                    if (remaining === 14.5) feedback += "✓ [PASS] Math calculation is correct (14.5 remaining).\n";
+                    else { errors.push("✗ [FAIL] 'remaining' is incorrect. It should be 50 - 15 - 20.5"); passed = false; }
+
+                    return { passed, errors, feedback };
+                }
+            },
+            3: {
+                title: "Lesson 3: The Decryption",
+                description: "A messenger has arrived with a scroll, but the text is messy. You must use Python's <strong>String Methods</strong> to clean it up.<br><br>Methods are tools attached to objects. For example: <code>text.upper()</code> converts text to uppercase.",
+                tasks: [
+                    "Create a variable <code>message</code> with the string <code>\"  danger comes  \"</code> (note the spaces).",
+                    "Create a variable <code>clean_message</code> by using <code>.strip()</code> on <code>message</code> to remove spaces.",
+                    "Create a variable <code>shout</code> by using <code>.upper()</code> on <code>clean_message</code>.",
+                    "Print the final <code>shout</code> variable."
+                ],
+                initialCode: "# The messenger hands you a crumpled scroll...\n\n",
+                success: "Clarity is power. You have stripped away the noise and found the truth hidden within the message. The warning is clear: DANGER COMES. Grip your Bokken tight.",
+                validate: (pyodide, output) => {
+                    let msg = pyodide.globals.get('message');
+                    let clean = pyodide.globals.get('clean_message');
+                    let shout = pyodide.globals.get('shout');
+                    
+                    let errors = []; let passed = true; let feedback = "";
+
+                    if (msg === "  danger comes  ") feedback += "✓ [PASS] You received the messy message.\n";
+                    else { errors.push("✗ [FAIL] 'message' should be exactly \"  danger comes  \"."); passed = false; }
+
+                    if (clean === "danger comes") feedback += "✓ [PASS] Whitespace removed (.strip()).\n";
+                    else { errors.push("✗ [FAIL] 'clean_message' still has spaces. Did you use .strip()?"); passed = false; }
+
+                    if (shout === "DANGER COMES") feedback += "✓ [PASS] Message converted to uppercase (.upper()).\n";
+                    else { errors.push("✗ [FAIL] 'shout' should be 'DANGER COMES'."); passed = false; }
+
+                    if (output.includes("DANGER COMES")) feedback += "✓ [PASS] You announced the warning.\n";
+                    else { errors.push("✗ [FAIL] You didn't print the final message."); passed = false; }
+
+                    return { passed, errors, feedback };
+                }
+            },
+            4: {
+                title: "Lesson 4: The Gatekeeper",
+                description: "The warning was true! A <strong>Shadow Spirit</strong> blocks the path. A warrior does not swing blindly; they judge the situation.<br><br>Use <strong>If/Else</strong> logic. If your power is greater than the enemy, you attack. Otherwise, you retreat.",
+                tasks: [
+                    "Create variable <code>my_power</code> set to <code>50</code>.",
+                    "Create variable <code>enemy_power</code> set to <code>75</code>.",
+                    "Write an <code>if</code> statement: checks if <code>my_power</code> is greater than (<code>></code>) <code>enemy_power</code>.",
+                    "Inside the <code>if</code>, print: <code>\"Attack!\"</code>.",
+                    "Write an <code>else</code> statement.",
+                    "Inside the <code>else</code>, print: <code>\"Retreat!\"</code>."
+                ],
+                initialCode: "# The Shadow Spirit towers over you...\n\n",
+                success: "Wise choice. The Spirit was too strong for you right now. A foolish warrior would have died; a smart one lives to train another day. You successfully retreated.",
+                validate: (pyodide, output) => {
+                    let myP = pyodide.globals.get('my_power');
+                    let enP = pyodide.globals.get('enemy_power');
+                    
+                    let errors = []; let passed = true; let feedback = "";
+
+                    // Check Variables
+                    if (myP === 50) feedback += "✓ [PASS] Your power is set to 50.\n";
+                    else { errors.push("✗ [FAIL] 'my_power' should be 50."); passed = false; }
+
+                    if (enP === 75) feedback += "✓ [PASS] Enemy power is set to 75.\n";
+                    else { errors.push("✗ [FAIL] 'enemy_power' should be 75."); passed = false; }
+
+                    // Check Logic Output
+                    // Since 50 is NOT > 75, it should go to Else and print "Retreat!"
+                    if (output.toLowerCase().includes("retreat")) {
+                        feedback += "✓ [PASS] Logic is sound. You chose to retreat.\n";
+                    } else if (output.toLowerCase().includes("attack")) {
+                        errors.push("✗ [FAIL] You attacked a stronger enemy! Check your if/else logic.");
+                        passed = false;
+                    } else {
+                        errors.push("✗ [FAIL] No valid command heard. Print 'Attack!' or 'Retreat!'.");
+                        passed = false;
+                    }
+
+                    // Check Source Code for "if" and ":" to ensure they didn't just print "Retreat"
+                    // (We have to access the raw text area for this)
+                    let sourceCode = document.getElementById("code-editor").value;
+                    if (!sourceCode.includes("if") || !sourceCode.includes(":")) {
+                        errors.push("✗ [IMPROVE] You must use an 'if' statement and a colon ':'.");
+                        passed = false;
+                    }
+
+                    return { passed, errors, feedback };
+                }
+            },
+            5: {
+                title: "Lesson 5: The Inventory",
+                description: "You retreated safely, but your gear is a mess. You must organize your <strong>List</strong> of supplies to survive the next attempt.<br><br>Lists are ordered collections using square brackets `[]`.<br>Ex: <code>items = [\"A\", \"B\"]</code>",
+                tasks: [
+                    "Create a list named <code>backpack</code> containing strings: <code>\"Rope\"</code>, <code>\"Map\"</code>, and <code>\"Bread\"</code>.",
+                    "You found a light source. Use <code>.append()</code> to add <code>\"Torch\"</code> to the backpack.",
+                    "You got hungry. Use <code>.remove()</code> to take out <code>\"Bread\"</code>.",
+                    "Print the final <code>backpack</code> list."
+                ],
+                initialCode: "# Back at camp, sorting supplies...\n\n",
+                success: "Your mind is organized, and so is your gear. A chaotic inventory leads to a chaotic death. With a Torch added and your belly full, you are ready to move forward.",
+                validate: (pyodide, output) => {
+                    let backpack = pyodide.globals.get('backpack');
+                    let errors = []; let passed = true; let feedback = "";
+
+                    // Check if variable exists
+                    if (!backpack) {
+                        errors.push("✗ [FAIL] You must create a variable named 'backpack'.");
+                        passed = false;
+                    } else {
+                        // Pyodide lists need to be converted to JS arrays to check contents easily
+                        // We use a try/catch in case they made 'backpack' a string or number by mistake
+                        try {
+                            let items = backpack.toJs(); // Convert Python List to JS Array
+                            
+                            // 1. Check if Torch was added
+                            if (items.includes("Torch")) feedback += "✓ [PASS] You packed the Torch.\n";
+                            else { errors.push("✗ [FAIL] The 'Torch' is missing. Did you .append() it?"); passed = false; }
+
+                            // 2. Check if Bread was removed
+                            if (!items.includes("Bread")) feedback += "✓ [PASS] You ate the Bread (removed it).\n";
+                            else { errors.push("✗ [FAIL] The 'Bread' is still there. Did you .remove() it?"); passed = false; }
+
+                            // 3. Check for original items
+                            if (items.includes("Rope") && items.includes("Map")) feedback += "✓ [PASS] Rope and Map are accounted for.\n";
+                            else { errors.push("✗ [FAIL] You lost the Rope or Map!"); passed = false; }
+                            
+                        } catch (e) {
+                            errors.push("✗ [FAIL] 'backpack' must be a List using [].");
+                            passed = false;
+                        }
+                    }
+
+                    // Check Print
+                    if (output.includes("Torch") && output.includes("Map")) feedback += "✓ [PASS] Inventory verified.\n";
+                    else { errors.push("✗ [FAIL] You didn't print the final backpack."); passed = false; }
+
+                    return { passed, errors, feedback };
+                }
+            },
+            6: {
+                title: "Lesson 6: The Training Yard",
+                description: "Before you face the boss, you must prove your stamina. A warrior does not strike once; they strike until the job is done.<br><br>Use a <strong>For Loop</strong> to repeat an action for every item in a list.<br>Syntax: <code>for item in list:</code> (Don't forget the indent!)",
+                tasks: [
+                    "Create a list <code>enemies</code> containing: <code>\"Goblin\"</code>, <code>\"Orc\"</code>, and <code>\"Slime\"</code>.",
+                    "Write a <code>for</code> loop that iterates through the <code>enemies</code> list. (Use variable name <code>enemy</code> for the iterator).",
+                    "Inside the loop, <code>print</code> the phrase: <code>\"Attacking \" + enemy</code>."
+                ],
+                initialCode: "# The training dummies are lined up...\n\n",
+                success: "Your blade moves with rhythm. One command, multiple strikes. You have learned the art of automation. The repetitive tasks of the world no longer burden you.",
+                validate: (pyodide, output) => {
+                    let enemies = pyodide.globals.get('enemies');
+                    let errors = []; let passed = true; let feedback = "";
+
+                    // 1. Check List Existence
+                    if (!enemies) {
+                         errors.push("✗ [FAIL] You must create a list named 'enemies'.");
+                         passed = false;
+                    } else {
+                        try {
+                            let items = enemies.toJs();
+                            if (items.length === 3 && items.includes("Goblin") && items.includes("Slime")) {
+                                 feedback += "✓ [PASS] The enemies are lined up.\n";
+                            } else {
+                                 errors.push("✗ [FAIL] The list should contain 'Goblin', 'Orc', and 'Slime'.");
+                                 passed = false;
+                            }
+                        } catch(e) {
+                            errors.push("✗ [FAIL] 'enemies' must be a List.");
+                            passed = false;
+                        }
+                    }
+
+                    // 2. Check Loop Syntax (Source Code Check)
+                    // We check the raw text to ensure they actually used a loop and didn't just print 3 times manually
+                    let sourceCode = document.getElementById("code-editor").value;
+                    if (!sourceCode.includes("for ") || !sourceCode.includes(":")) {
+                         errors.push("✗ [IMPROVE] You must use a 'for' loop and a colon ':'.");
+                         passed = false;
+                    }
+
+                    // 3. Check Output Logic
+                    if (output.includes("Attacking Goblin") && output.includes("Attacking Orc") && output.includes("Attacking Slime")) {
+                        feedback += "✓ [PASS] You struck every target in the list!\n";
+                    } else {
+                        errors.push("✗ [FAIL] The output is missing attacks. Did you print inside the loop?");
+                        passed = false;
+                    }
+
+                    return { passed, errors, feedback };
+                }
+            },
+            7: {
+                title: "Lesson 7: The Archive",
+                description: "Brute force will not work on high-level demons. You must know their weaknesses.<br><br>Use a <strong>Dictionary</strong> to map specific keys to values.<br>Syntax: <code>data = {\"Key\": \"Value\"}</code> (Use curly braces!)",
+                tasks: [
+                    "Create a dictionary named <code>bestiary</code>.",
+                    "Add these Key-Value pairs inside it:<br> - <code>\"Goblin\"</code> : <code>\"Fire\"</code><br> - <code>\"Wraith\"</code> : <code>\"Light\"</code><br> - <code>\"Troll\"</code> : <code>\"Acid\"</code>",
+                    "A Wraith blocks the hallway! Access its weakness from the dictionary using square brackets: <code>bestiary[\"Wraith\"]</code>.",
+                    "Save that weakness into a variable named <code>weapon_type</code> and print it."
+                ],
+                initialCode: "# You open the dusty book of monsters...\n\n",
+                success: "Knowledge is sharper than steel. You did not guess; you knew. By striking the Wraith with Light, it vanished instantly. You are learning to access data by its name, not just its order.",
+                validate: (pyodide, output) => {
+                    let bestiary = pyodide.globals.get('bestiary');
+                    let weapon = pyodide.globals.get('weapon_type');
+                    let errors = []; let passed = true; let feedback = "";
+
+                    // 1. Check Dictionary Existence
+                    if (!bestiary) {
+                        errors.push("✗ [FAIL] You must create a dictionary named 'bestiary'.");
+                        passed = false;
+                    } else {
+                        try {
+                            // Pyodide Dicts convert to JS Maps
+                            let bMap = bestiary.toJs();
+                            
+                            // Check keys and values
+                            if (bMap.get("Goblin") === "Fire" && bMap.get("Wraith") === "Light") {
+                                feedback += "✓ [PASS] The Bestiary contains the correct lore.\n";
+                            } else {
+                                errors.push("✗ [FAIL] The dictionary entries are wrong. Check your spelling of 'Goblin', 'Wraith', etc.");
+                                passed = false;
+                            }
+                        } catch (e) {
+                            errors.push("✗ [FAIL] 'bestiary' must be a Dictionary using {}.");
+                            passed = false;
+                        }
+                    }
+
+                    // 2. Check Access
+                    if (weapon === "Light") {
+                        feedback += "✓ [PASS] You correctly identified the Wraith's weakness.\n";
+                    } else {
+                        errors.push("✗ [FAIL] 'weapon_type' should be 'Light'. Did you access bestiary[\"Wraith\"]?");
+                        passed = false;
+                    }
+
+                    // 3. Check Print
+                    if (output.includes("Light")) {
+                        feedback += "✓ [PASS] You shouted the correct spell.\n";
+                    } else {
+                        errors.push("✗ [FAIL] You didn't print the weapon_type.");
+                        passed = false;
+                    }
+
+                    return { passed, errors, feedback };
+                }
+            },
+            8: {
+                title: "Lesson 8: The Technique",
+                description: "You find yourself casting the same spell repeatedly. A master does not rewrite the scroll every time; they create a <strong>Function</strong>.<br><br>Functions are reusable blocks of code.<br>Syntax:<br><code>def my_function():</code><br>&nbsp;&nbsp;&nbsp;&nbsp;<code># code here</code><br><br>To use it, you must <strong>Call</strong> it: <code>my_function()</code>",
+                tasks: [
+                    "Define a function named <code>cast_fire</code> using <code>def</code>.",
+                    "Inside the function, print the phrase <code>\"Fireball!\"</code>.",
+                    "Now, step out of the function (remove indent) and <strong>Call</strong> <code>cast_fire()</code> 3 times to launch a volley."
+                ],
+                initialCode: "# The enemy approaches. Prepare your technique...\n\n",
+                success: "Excellent. You encapsulated a complex action into a single command. You no longer describe the fire; you simply command it. This is the power of Abstraction.",
+                validate: (pyodide, output) => {
+                    let castFire = pyodide.globals.get('cast_fire');
+                    let errors = []; let passed = true; let feedback = "";
+
+                    // 1. Check Function Definition
+                    if (typeof castFire === 'function') {
+                        feedback += "✓ [PASS] You defined the technique 'cast_fire'.\n";
+                    } else {
+                        errors.push("✗ [FAIL] You must define a function named 'cast_fire'.");
+                        passed = false;
+                    }
+
+                    // 2. Check Output (Did it run 3 times?)
+                    // We split the output by newlines and count occurrences of "Fireball!"
+                    let matches = (output.match(/Fireball!/g) || []).length;
+                    
+                    if (matches >= 3) {
+                        feedback += "✓ [PASS] You launched a volley of 3 fireballs.\n";
+                    } else if (matches > 0) {
+                        errors.push("✗ [FAIL] You fired, but not enough. Call the function 3 times.");
+                        passed = false;
+                    } else {
+                        errors.push("✗ [FAIL] No fireballs detected. Did you print 'Fireball!' inside the function?");
+                        passed = false;
+                    }
+
+                    // 3. Check Source Code (Indent check)
+                    let sourceCode = document.getElementById("code-editor").value;
+                    if (!sourceCode.includes("def cast_fire():")) {
+                        errors.push("✗ [IMPROVE] Check your syntax: def cast_fire():");
+                        passed = false;
+                    }
+
+                    return { passed, errors, feedback };
+                }
+            },
+            9: {
+                title: "Lesson 9: The Precision Strike",
+                description: "A blind swing is foolish. You must adjust your force based on the target. Functions accept <strong>Arguments</strong> (inputs) and can send back a <strong>Return Value</strong> (output).<br><br>Syntax:<br><code>def add(a, b):</code><br>&nbsp;&nbsp;&nbsp;&nbsp;<code>return a + b</code>",
+                tasks: [
+                    "Define a function <code>calculate_damage</code> that accepts two arguments: <code>base</code> and <code>bonus</code>.",
+                    "Inside the function, create a variable <code>total</code> that is the sum of <code>base</code> and <code>bonus</code>.",
+                    "Use the <code>return</code> keyword to send <code>total</code> back (do NOT print inside the function).",
+                    "Outside the function, call it with <code>10</code> and <code>5</code>. Save the result into a variable named <code>hit</code>.",
+                    "Print <code>hit</code>."
+                ],
+                initialCode: "# Calculate the perfect strike...\n\n",
+                success: "Your technique is flawless. You provided the raw strength (arguments), and the form returned the exact force required. A master does not guess the weight of their blow; they calculate it before it lands.",
+                validate: (pyodide, output) => {
+                    let calcFunc = pyodide.globals.get('calculate_damage');
+                    let hitVar = pyodide.globals.get('hit');
+                    let errors = []; let passed = true; let feedback = "";
+
+                    // 1. Check Function Existence & Logic
+                    if (!calcFunc || typeof calcFunc !== 'function') {
+                        errors.push("✗ [FAIL] You must define the function 'calculate_damage'.");
+                        passed = false;
+                    } else {
+                        try {
+                            // We test their function with OUR numbers to make sure it works dynamically
+                            let testResult = calcFunc(20, 20);
+                            if (testResult === 40) {
+                                feedback += "✓ [PASS] Your function calculates damage correctly.\n";
+                            } else {
+                                errors.push("✗ [FAIL] The function logic is wrong. It should return base + bonus.");
+                                passed = false;
+                            }
+                        } catch(e) {
+                            errors.push("✗ [FAIL] Your function crashed when we tested it. Did you use arguments?");
+                            passed = false;
+                        }
+                    }
+
+                    // 2. Check the 'hit' variable
+                    if (hitVar === 15) {
+                        feedback += "✓ [PASS] You called the function and saved the result (15).\n";
+                    } else {
+                        errors.push("✗ [FAIL] 'hit' should be 15 (10 + 5). Did you call the function correctly?");
+                        passed = false;
+                    }
+
+                    // 3. Check Print
+                    if (output.includes("15")) {
+                        feedback += "✓ [PASS] You revealed the damage number.\n";
+                    } else {
+                        errors.push("✗ [FAIL] You didn't print the final 'hit' variable.");
+                        passed = false;
+                    }
+
+                    // 4. Check for 'return' keyword usage (Source check)
+                    let sourceCode = document.getElementById("code-editor").value;
+                    if (!sourceCode.includes("return")) {
+                        errors.push("✗ [FAIL] You must use the 'return' keyword, not print, inside the function.");
+                        passed = false;
+                    }
+
+                    return { passed, errors, feedback };
+                }
+            },
+            10: {
+                title: "Lesson 10: The Alliance",
+                description: "You cannot forge every blade yourself. A master knows when to call upon the Ancients.<br><br>Python has a vast library of scrolls called <strong>Modules</strong>. To use them, you must <code>import</code> them.<br>Example: <code>import random</code> gives you access to <code>random.randint(a, b)</code>.",
+                tasks: [
+                    "Write <code>import random</code> at the top of your scroll.",
+                    "Create a variable <code>roll</code> that generates a number between 1 and 20 using <code>random.randint(1, 20)</code>.",
+                    "Print the variable <code>roll</code>.",
+                    "If <code>roll</code> is greater than 15, print <code>\"Critical Hit!\"</code>."
+                ],
+                initialCode: "# Calling upon the Ancients...\n\n",
+                success: "You are no longer fighting alone. By forming this Alliance, you wield the power of chaos itself. You have learned that true mastery is not just writing code, but leveraging the wisdom of those who came before you.",
+                validate: (pyodide, output) => {
+                    let roll = pyodide.globals.get('roll');
+                    let errors = []; let passed = true; let feedback = "";
+
+                    // 1. Check Import (Source Check)
+                    let sourceCode = document.getElementById("code-editor").value;
+                    if (!sourceCode.includes("import random")) {
+                        errors.push("✗ [FAIL] You must 'import random' to use this power.");
+                        passed = false;
+                    }
+
+                    // 2. Check the Variable
+                    if (typeof roll === 'number') {
+                        feedback += "✓ [PASS] The die is cast. You rolled: " + roll + ".\n";
+                        if (roll < 1 || roll > 20) {
+                            errors.push("✗ [FAIL] The roll is out of bounds. Did you use random.randint(1, 20)?");
+                            passed = false;
+                        }
+                    } else {
+                        errors.push("✗ [FAIL] 'roll' variable is missing or not a number.");
+                        passed = false;
+                    }
+
+                    // 3. Check Logic (Conditional Output)
+                    if (roll > 15) {
+                        if (output.toLowerCase().includes("critical")) {
+                            feedback += "✓ [PASS] High roll detected. Critical Hit confirmed.\n";
+                        } else {
+                            errors.push("✗ [FAIL] You rolled > 15 but didn't print 'Critical Hit!'.");
+                            passed = false;
+                        }
+                    } else {
+                        // If roll is low, we just ensure they didn't erroneously print Critical Hit
+                        if (output.toLowerCase().includes("critical")) {
+                            errors.push("✗ [FAIL] You rolled <= 15 but still claimed a Critical Hit. Check your if statement.");
+                            passed = false;
+                        } else {
+                            feedback += "✓ [PASS] Logic holds. No false glory claimed.\n";
+                        }
+                    }
+
+                    return { passed, errors, feedback };
+                }
+            },
+            11: {
+                title: "Lesson 11: The Blueprint",
+                description: "You have used tools, but now you must create life. A <strong>Class</strong> is a blueprint for creating Objects. It defines what a thing *is*.<br><br>Syntax:<br><code>class Hero:</code><br>&nbsp;&nbsp;&nbsp;&nbsp;<code>def __init__(self, name):</code><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>self.name = name</code>",
+                tasks: [
+                    "Define a class named <code>Hero</code>.",
+                    "Add an <code>__init__</code> method that takes <code>self</code> and <code>name</code>.",
+                    "Inside <code>__init__</code>, assign <code>self.name = name</code>.",
+                    "Outside the class, create an instance: <code>my_hero = Hero(\"YourName\")</code>.",
+                    "Print <code>my_hero.name</code>."
+                ],
+                initialCode: "# The architect draws the blueprint of a legend...\n\n",
+                // Narrative Update: Focused on 'Creation' and 'Essence'
+                success: "You have stepped into the realm of the Creator. You did not just use a sword; you defined what it means to be a Hero. By writing this blueprint, you ensure that legends can be born again and again.",
+                validate: (pyodide, output) => {
+                    let HeroClass = pyodide.globals.get('Hero');
+                    let myHero = pyodide.globals.get('my_hero');
+                    let errors = []; let passed = true; let feedback = "";
+
+                    if (typeof HeroClass !== 'function') {
+                        errors.push("✗ [FAIL] You must define a class named 'Hero'.");
+                        passed = false;
+                    }
+
+                    if (myHero) {
+                        try {
+                            if (myHero.name && typeof myHero.name === 'string') {
+                                feedback += "✓ [PASS] The Hero instance exists and has a name: " + myHero.name + ".\n";
+                            } else {
+                                errors.push("✗ [FAIL] The hero instance is missing the 'name' attribute. Did you set self.name = name?");
+                                passed = false;
+                            }
+                        } catch(e) {
+                             errors.push("✗ [FAIL] Could not verify instance attributes. Check your __init__ syntax.");
+                             passed = false;
+                        }
+                    } else {
+                        errors.push("✗ [FAIL] You must create an instance named 'my_hero'.");
+                        passed = false;
+                    }
+
+                    if (output.trim().length > 0) {
+                        feedback += "✓ [PASS] You spoke the Hero's name.\n";
+                    } else {
+                         errors.push("✗ [FAIL] You didn't print the hero's name.");
+                         passed = false;
+                    }
+
+                    return { passed, errors, feedback };
+                }
+            },
+            12: {
+                title: "Lesson 12: The Unseen Trap",
+                description: "The path is not always clear. Sometimes, the numbers betray you. A master does not fear errors; they <strong>Catch</strong> them.<br><br>Use <code>try</code> and <code>except</code> to handle crashes safely.<br>Syntax:<br><code>try:</code><br>&nbsp;&nbsp;&nbsp;&nbsp;<code># risky code</code><br><code>except ZeroDivisionError:</code><br>&nbsp;&nbsp;&nbsp;&nbsp;<code># rescue code</code>",
+                tasks: [
+                    "Create variable <code>gold</code> = <code>100</code> and <code>party</code> = <code>0</code>.",
+                    "Write a <code>try</code> block.",
+                    "Inside <code>try</code>, print the result of <code>gold / party</code>.",
+                    "Write an <code>except ZeroDivisionError:</code> block.",
+                    "Inside <code>except</code>, print <code>\"The party is empty!\"</code>."
+                ],
+                initialCode: "# A trap lies ahead. Prepare to catch the error...\n\n",
+                // Narrative Update: Focused on 'Resilience' and 'Balance'
+                success: "The trap snapped shut, but you stood firm. Where a novice would have been destroyed by the void of division, you anticipated the chaos and maintained your stance. You have mastered the art of Resilience.",
+                validate: (pyodide, output) => {
+                    let gold = pyodide.globals.get('gold');
+                    let party = pyodide.globals.get('party');
+                    let errors = []; let passed = true; let feedback = "";
+
+                    if (gold === 100 && party === 0) {
+                        feedback += "✓ [PASS] Variables set to trigger the trap (100 / 0).\n";
+                    } else {
+                        errors.push("✗ [FAIL] Set gold=100 and party=0 to test the error.");
+                        passed = false;
+                    }
+
+                    let sourceCode = document.getElementById("code-editor").value;
+                    if (!sourceCode.includes("try:") || !sourceCode.includes("except")) {
+                        errors.push("✗ [FAIL] You must use 'try' and 'except' blocks.");
+                        passed = false;
+                    }
+
+                    if (output.includes("The party is empty!")) {
+                        feedback += "✓ [PASS] You caught the error and printed the warning.\n";
+                    } else if (output.includes("Traceback") || output.includes("Error")) {
+                        errors.push("✗ [FAIL] The code crashed! You didn't catch the ZeroDivisionError.");
+                        passed = false;
+                    } else {
+                        errors.push("✗ [FAIL] You didn't print the specific message: 'The party is empty!'");
+                        passed = false;
+                    }
+
+                    return { passed, errors, feedback };
+                }
+            },
+            13: {
+                title: "BOSS BATTLE: The Shadow Ronin",
+                description: "Your reflection steps out of the mirror. It is the Shadow Ronin. To defeat him, you must prove you can create a warrior that thinks and acts on its own.<br><br><strong>Objectives:</strong><br>1. <code>import random</code>.<br>2. Define a class <code>Samurai</code>.<br>3. Add a method <code>strike(self)</code> that <strong>returns</strong> a <code>random.randint(10, 20)</code>.<br>4. Create an instance: <code>player = Samurai()</code>.<br>5. Call <code>hit = player.strike()</code>.<br>6. Write Logic: If <code>hit > 15</code>, print <code>\"Critical Hit!\"</code>. Else, print <code>\"Glancing Blow!\"</code>.",
+                tasks: [
+                    "Import the <code>random</code> module.",
+                    "Define class <code>Samurai</code> with a method <code>strike(self)</code>.",
+                    "Inside <code>strike</code>, return a random number between 10 and 20.",
+                    "Create an instance named <code>player</code>.",
+                    "Call <code>player.strike()</code> and save it to variable <code>hit</code>.",
+                    "If <code>hit > 15</code> print \"Critical Hit!\", else print \"Glancing Blow!\"."
+                ],
+                initialCode: "# The Shadow draws his blade. Write your destiny...\n\n",
+                // NARRATIVE FIX: No longer "Graduation", but "End of Act 1"
+                success: "The Shadow Ronin bows and dissolves into mist. You have won your first true battle. But do not grow arrogant, student. You have mastered the Sword (Logic), but you have not yet mastered the Scroll (Data). The path ahead is long, and the world is full of chaos waiting to be tamed.",
+                validate: (pyodide, output) => {
+                    let SamuraiClass = pyodide.globals.get('Samurai');
+                    let player = pyodide.globals.get('player');
+                    let hit = pyodide.globals.get('hit');
+                    let errors = []; let passed = true; let feedback = "";
+                    let sourceCode = document.getElementById("code-editor").value;
+                    if (!sourceCode.includes("import random")) {
+                        errors.push("✗ [FAIL] You cannot fight fate without 'import random'.");
+                        passed = false;
+                    }
+
+                    if (typeof SamuraiClass !== 'function') {
+                        errors.push("✗ [FAIL] You must define the class 'Samurai'.");
+                        passed = false;
+                    } else {
+                        try {
+                            pyodide.runPython(`
+test_ghost = Samurai()
+test_dmg = test_ghost.strike()
+                            `);
+                            let testDmg = pyodide.globals.get('test_dmg');
+                            if (typeof testDmg === 'number' && testDmg >= 10 && testDmg <= 20) {
+                                feedback += "✓ [PASS] Your Samurai class strikes with valid damage (10-20).\n";
+                            } else {
+                                errors.push("✗ [FAIL] The strike() method must return a number between 10 and 20.");
+                                passed = false;
+                            }
+                        } catch(e) {
+                            errors.push("✗ [FAIL] Your Samurai class is broken. Does it have a strike(self) method?");
+                            passed = false;
+                        }
+                    }
+
+                    if (!player) {
+                        errors.push("✗ [FAIL] You must create an instance named 'player'.");
+                        passed = false;
+                    }
+
+                    if (typeof hit === 'number') {
+                        if (hit > 15) {
+                            if (output.includes("Critical Hit!")) feedback += "✓ [PASS] High roll ("+hit+") -> Critical Hit confirmed.\n";
+                            else { errors.push("✗ [FAIL] You rolled "+hit+" (>15) but didn't print 'Critical Hit!'."); passed = false; }
+                        } else {
+                            if (output.includes("Glancing Blow!")) feedback += "✓ [PASS] Low roll ("+hit+") -> Glancing Blow confirmed.\n";
+                            else { errors.push("✗ [FAIL] You rolled "+hit+" (<=15) but didn't print 'Glancing Blow!'."); passed = false; }
+                        }
+                    } else {
+                        errors.push("✗ [FAIL] The 'hit' variable is missing.");
+                        passed = false;
+                    }
+
+                    return { passed, errors, feedback };
+                }
+            },
+            14: {
+                title: "Lesson 14: The Thousand-Fold Strike",
+                description: "You enter the Hall of Multiples. A novice strikes one target at a time. A master strikes them all at once. <br><br><strong>Numpy</strong> allows 'Vectorized' movement—applying one action to an entire array instantly.<br>1. <code>import numpy as np</code><br>2. Create array: <code>arr = np.array([1, 2, 3])</code><br>3. Multiply the array by 2.",
+                tasks: [
+                    "Import <code>numpy</code> as <code>np</code>.",
+                    "Create a numpy array <code>strikes</code> with the values <code>[10, 20, 30, 40]</code>.",
+                    "Focus your Qi! Double the power of every strike at once: <code>strikes * 2</code>.",
+                    "Save the result to a variable <code>combo</code> and print it."
+                ],
+                initialCode: "# The training dummies surround you...\n\n",
+                success: "In a single breath, every target was hit. You have moved beyond the limitations of the Loop. This is the speed of the Thousand-Fold Strike.",
+                validate: (pyodide, output) => {
+                    let combo = pyodide.globals.get('combo');
+                    let errors = []; let passed = true; let feedback = "";
+
+                    let source = document.getElementById("code-editor").value;
+                    if (!source.includes("import numpy")) {
+                        errors.push("✗ [FAIL] You must summon the 'numpy' technique.");
+                        passed = false;
+                    }
+
+                    if (combo) {
+                        try {
+                            let data = combo.toJs(); 
+                            // Fixed check: strictly looking for [20, 40, 60, 80]
+                            if (data.length === 4 && data[0] === 20 && data[3] === 80) {
+                                feedback += "✓ [PASS] All targets struck with double power [20, 40, 60, 80].\n";
+                            } else {
+                                errors.push("✗ [FAIL] The math is weak. Expected [20, 40, 60, 80].");
+                                passed = false;
+                            }
+                        } catch (e) {
+                             errors.push("✗ [FAIL] 'combo' must be a Numpy Array.");
+                             passed = false;
+                        }
+                    } else {
+                        errors.push("✗ [FAIL] Variable 'combo' is missing.");
+                        passed = false;
+                    }
+
+                    return { passed, errors, feedback };
+                }
+            },
+            15: {
+                title: "Lesson 15: The Grand Archive",
+                description: "To understand the world outside the dojo, you must organize it. We use <strong>Pandas</strong> to create a 'DataFrame'—a sacred scroll of rows and columns.<br><br>1. <code>import pandas as pd</code><br>2. Create data: <code>data = {\"Col1\": [1, 2], \"Col2\": [3, 4]}</code><br>3. Create DataFrame: <code>df = pd.DataFrame(data)</code><br>4. Check dimensions: <code>df.shape</code>",
+                tasks: [
+                    "Import <code>pandas</code> as <code>pd</code>.",
+                    "Create a dictionary <code>scroll_data</code> with keys:<br> - <code>\"Student\"</code>: <code>[\"Jin\", \"Yuna\", \"Ken\"]</code><br> - <code>\"Rank\"</code>: <code>[1, 5, 3]</code>",
+                    "Convert it to a DataFrame named <code>dojo_df</code>.",
+                    "Print <code>dojo_df.shape</code> to measure the archive's size."
+                ],
+                initialCode: "# Organizing the ancient scrolls...\n\n",
+                success: "The chaos is now ordered. Rows of students, columns of rank. You can see the structure of the Dojo at a glance. This is the foundation of wisdom.",
+                validate: (pyodide, output) => {
+                    let df = pyodide.globals.get('dojo_df');
+                    let errors = []; let passed = true; let feedback = "";
+
+                    if (!document.getElementById("code-editor").value.includes("import pandas")) {
+                         errors.push("✗ [FAIL] Import pandas first.");
+                         passed = false;
+                    }
+
+                    if (df) {
+                        let shape = df.shape; 
+                        let rows = shape.get(0);
+                        let cols = shape.get(1);
+
+                        if (rows === 3 && cols === 2) {
+                             feedback += "✓ [PASS] The Archive is built: 3 Students, 2 Attributes.\n";
+                        } else {
+                             errors.push("✗ [FAIL] The shape is wrong. Expected (3, 2). Check your data lists.");
+                             passed = false;
+                        }
+                    } else {
+                        errors.push("✗ [FAIL] 'dojo_df' not found.");
+                        passed = false;
+                    }
+
+                    if (output.includes("(3, 2)")) {
+                        feedback += "✓ [PASS] You surveyed the dimensions of the dojo.\n";
+                    } else {
+                         errors.push("✗ [FAIL] You did not print the .shape of the dataframe.");
+                         passed = false;
+                    }
+
+                    return { passed, errors, feedback };
+                }
+            },
+            16: {
+                title: "Lesson 16: The Precision Cut",
+                description: "A warrior does not swing blindly at the crowd. You must strike the pressure point. We use <strong>.loc</strong> to target specific data in the DataFrame.<br><br>Syntax: <code>df.loc[row_index, \"ColumnName\"]</code>",
+                tasks: [
+                    "Import pandas as pd.",
+                    "Create a DataFrame <code>df</code> with data: <code>{\"Enemy\": [\"Ninja\", \"Samurai\", \"Ronin\"], \"Health\": [50, 100, 80]}</code>.",
+                    "The opponent at index 1 is strong. Use <code>.loc</code> to target the <code>\"Health\"</code> of row <code>1</code>.",
+                    "Save this value to <code>target_hp</code> and print it."
+                ],
+                initialCode: "# Seeking the weak point...\n\n",
+                success: "Precision. You ignored the distractions and isolated the single truth that mattered. By knowing the enemy's exact Health, you know exactly how hard to strike.",
+                validate: (pyodide, output) => {
+                    let errors = []; let passed = true; let feedback = "";
+                    let hpVal = null;
+
+                    try {
+                        // FORCE Python to cast it to a standard int. 
+                        // This bypasses all Numpy/BigInt/Proxy confusion.
+                        hpVal = pyodide.runPython("int(target_hp)");
+                    } catch (e) {
+                        errors.push("✗ [FAIL] Could not read 'target_hp'. Did you define it?");
+                        passed = false;
+                    }
+
+                    if (passed) {
+                        if (hpVal === 100) {
+                            feedback += "✓ [PASS] You identified the Samurai's health (100).\n";
+                        } else {
+                            errors.push("✗ [FAIL] Incorrect value. Expected 100, but got " + hpVal + ".");
+                            passed = false;
+                        }
+                    }
+
+                    if (output.includes("100")) feedback += "✓ [PASS] Target locked.\n";
+                    
+                    return { passed, errors, feedback };
+                }
+            },
+            17: {
+                title: "Lesson 17: The Faded Ink",
+                description: "The ancient scrolls are damaged. Some techniques are missing (NaN - Not a Number). A master does not guess; they identify the void.<br><br>Use <code>.isnull()</code> to find the gaps in the data.",
+                tasks: [
+                    "Import pandas and numpy (<code>import numpy as np</code>).",
+                    "Create this dataframe:<br><code>df = pd.DataFrame({\"Technique\": [\"Kick\", \"Punch\", \"Throw\"], \"Power\": [10, np.nan, 30]})</code>",
+                    "Count the missing values using <code>df.isnull().sum()</code> and save it to <code>void_count</code>.",
+                    "Print <code>void_count</code>."
+                ],
+                initialCode: "# The scroll is torn and illegible...\n\n",
+                success: "You have stared into the void and measured it. Where a novice ignores the gaps in knowledge, a master acknowledges what is missing. Only then can it be restored.",
+                validate: (pyodide, output) => {
+                    let count = pyodide.globals.get('void_count');
+                    let errors = []; let passed = true; let feedback = "";
+
+                    // FIX: Convert Pandas Series to a JS Map to inspect it properly
+                    let missingPower = 0;
+                    
+                    if (count) {
+                        try {
+                            // If it's a PyProxy (Pandas object), convert it
+                            if (typeof count.toJs === 'function') {
+                                let map = count.toJs(); 
+                                // In JS, a Pandas Series becomes a Map: Map(2) { 'Technique' => 0, 'Power' => 1 }
+                                missingPower = map.get('Power');
+                            }
+                        } catch(e) {
+                            // Fallback if they somehow made a simple integer/list
+                            console.log(e);
+                        }
+                    }
+
+                    if (missingPower === 1) {
+                         feedback += "✓ [PASS] Void analysis complete. Found 1 missing value in 'Power'.\n";
+                    } else {
+                        // We check the print output as a backup for the user
+                        if (output.includes("Power") && output.includes("1")) {
+                            feedback += "✓ [PASS] Output looks correct.\n";
+                        } else {
+                            errors.push("✗ [FAIL] Analysis incorrect. Expected 1 missing value in 'Power'.");
+                            passed = false;
+                        }
+                    }
+
+                    return { passed, errors, feedback };
+                }
+            },
+            18: {
+                title: "Lesson 18: The Painter's Eye",
+                description: "Numbers are cold. To see the flow of Qi, you must visualize it. We use <strong>Matplotlib</strong> to draw the currents of energy.<br><br>1. <code>import matplotlib.pyplot as plt</code><br>2. <code>plt.plot(x_list, y_list)</code><br>3. <code>plt.show()</code>",
+                tasks: [
+                    "Import <code>matplotlib.pyplot</code> as <code>plt</code>.",
+                    "Define days of training: <code>days = [1, 2, 3, 4]</code>.",
+                    "Define your spirit level: <code>spirit = [20, 35, 30, 50]</code>.",
+                    "Plot the data using <code>plt.plot(days, spirit)</code>.",
+                    "<strong>Vital:</strong> You must clear your mind (and the canvas) to see the result: <code>plt.show()</code>."
+                ],
+                initialCode: "# Visualizing the flow of energy...\n\n",
+                success: "A picture reveals what numbers cannot. The curve shows your spirit rising, faltering, and rising again. This is the path of training made visible.",
+                validate: (pyodide, output) => {
+                    let source = document.getElementById("code-editor").value;
+                    let errors = []; let passed = true; let feedback = "";
+
+                    if (!source.includes("plt.plot")) {
+                        errors.push("✗ [FAIL] You must use plt.plot().");
+                        passed = false;
+                    }
+                    if (!source.includes("plt.show()")) {
+                        errors.push("✗ [FAIL] You must use plt.show() to display the art.");
+                        passed = false;
+                    }
+
+                    if (passed) {
+                         feedback += "✓ [PASS] The ink is dry. The chart reveals your progress.\n";
+                    }
+
+                    return { passed, errors, feedback };
+                }
+            },
+            19: {
+                title: "Lesson 19: The Oracle's Summary",
+                description: "You have thousands of scrolls. You cannot read them one by one. You need the Oracle's Vision to see the whole picture at once.<br><br>Use <strong>.describe()</strong> to get a summary (Count, Mean, Min, Max) of your dataframe.",
+                tasks: [
+                    "Import pandas as pd.",
+                    "Create a DataFrame <code>df</code> with: <code>{\"Spirit\": [10, 20, 30, 40, 50]}</code>.",
+                    "Call <code>summary = df.describe()</code>.",
+                    "Print <code>summary</code>.",
+                    "Access the mean value specifically using <code>df[\"Spirit\"].mean()</code>, save it to <code>avg_spirit</code>, and print it."
+                ],
+                initialCode: "# The Oracle gazes into the data...\n\n",
+                success: "You no longer see individual numbers; you see the collective soul. The Average (Mean) is revealed to you, and the boundaries (Min/Max) are clear. This is the first step of the Oracle.",
+                validate: (pyodide, output) => {
+                    let errors = []; let passed = true; let feedback = "";
+                    let meanVal = null;
+
+                    try {
+                        // Nuclear Fix: Force Python to give us a simple float
+                        meanVal = pyodide.runPython("float(avg_spirit)");
+                    } catch (e) {
+                        errors.push("✗ [FAIL] Could not calculate 'avg_spirit'. Did you assign it?");
+                        passed = false;
+                    }
+
+                    if (passed) {
+                        if (meanVal === 30) {
+                            feedback += "✓ [PASS] The Mean Spirit is correct (30).\n";
+                        } else {
+                            errors.push("✗ [FAIL] The Mean is wrong. Expected 30, got " + meanVal);
+                            passed = false;
+                        }
+                    }
+
+                    if (output.includes("std") && output.includes("min")) {
+                         feedback += "✓ [PASS] The Oracle's Summary (.describe) was invoked.\n";
+                    } else {
+                         errors.push("✗ [FAIL] You didn't print the .describe() summary.");
+                         passed = false;
+                    }
+
+                    return { passed, errors, feedback };
+                }
+            },
+            20: {
+                title: "Lesson 20: The Archer's Paradox",
+                description: "Two archers can have the same average score, yet one is a master and one is a fool. We measure consistency using <strong>Standard Deviation (.std)</strong>.<br><br>Low Std Dev = Precision (Mastery).<br>High Std Dev = Chaos (Luck).",
+                tasks: [
+                    "Import pandas as pd.",
+                    "Create two lists of arrow scores:<br> - <code>master = [10, 10, 10, 10]</code> (Precision)<br> - <code>novice = [0, 20, 0, 20]</code> (Chaos)",
+                    "Create a DataFrame <code>df</code> with these columns.",
+                    "Calculate the standard deviation of the Novice: <code>df[\"novice\"].std()</code>.",
+                    "Save it to variable <code>chaos</code> and print it."
+                ],
+                initialCode: "# The arrow flies true, or it flies wild...\n\n",
+                success: "You see the truth. Both archers have the same average score (10), but the Novice relies on luck. You have learned that the Average is a lie without the Standard Deviation.",
+                validate: (pyodide, output) => {
+                    let errors = []; let passed = true; let feedback = "";
+                    let chaos = null;
+
+                    try {
+                        chaos = pyodide.runPython("float(chaos)");
+                    } catch (e) {
+                        errors.push("✗ [FAIL] 'chaos' variable not found.");
+                        passed = false;
+                    }
+
+                    if (passed) {
+                        // Std Dev of [0, 20, 0, 20] is approx 11.547
+                        if (chaos > 11.5 && chaos < 11.6) {
+                            feedback += "✓ [PASS] You measured the chaos correctly (~11.55).\n";
+                        } else {
+                            errors.push("✗ [FAIL] Calculation wrong. Expected ~11.55, got " + chaos);
+                            passed = false;
+                        }
+                    }
+
+                    return { passed, errors, feedback };
+                }
+            },
+            21: {
+                title: "Lesson 21: The Outlier",
+                description: "Who is the Chosen One? Who is the traitor? To find them, we measure how far they stand from the crowd using the <strong>Z-Score</strong>.<br><br>Formula: Z = (Value - Mean) / StdDev.",
+                tasks: [
+                    "Import pandas as pd.",
+                    "Create a dataframe with <code>\"Power\": [10, 12, 11, 13, 100]</code>.",
+                    "Calculate the Mean of 'Power' and save to <code>mu</code>.",
+                    "Calculate the Std Dev of 'Power' and save to <code>sigma</code>.",
+                    "Calculate the Z-score for the last value (100): <code>(100 - mu) / sigma</code>.",
+                    "Save the result to <code>z_score</code> and print it."
+                ],
+                initialCode: "# Searching for the anomaly...\n\n",
+                success: "You have isolated the anomaly. A Z-Score tells you exactly how 'abnormal' a data point is. The value 100 is not just high; it is statistically legendary.",
+                validate: (pyodide, output) => {
+                    let errors = []; let passed = true; let feedback = "";
+                    let z = null;
+
+                    try {
+                        z = pyodide.runPython("float(z_score)");
+                    } catch (e) {
+                        errors.push("✗ [FAIL] 'z_score' variable not found.");
+                        passed = false;
+                    }
+
+                    if (passed) {
+                        // Mean = 29.2, Std = 39.58, Z ≈ 1.78
+                        if (z > 1.7 && z < 1.9) {
+                            feedback += "✓ [PASS] Z-Score calculated correctly (~1.78).\n";
+                        } else {
+                            errors.push("✗ [FAIL] Math error. Did you use parentheses? (100 - mu) / sigma");
+                            passed = false;
+                        }
+                    }
+
+                    return { passed, errors, feedback };
+                }
+            },
+            22: {
+                title: "Lesson 22: The Invisible Link",
+                description: "Does meditation increase power? Does rain cause defeat? We measure the connection between two forces using <strong>Correlation (.corr)</strong>.<br><br>1.0 = Perfect Link.<br>0.0 = No Link.<br>-1.0 = Opposite Link.",
+                tasks: [
+                    "Import pandas as pd.",
+                    "Create a DataFrame with two columns:<br> - <code>\"Meditation\": [1, 2, 3, 4]</code><br> - <code>\"Power\": [10, 20, 30, 40]</code>",
+                    "Calculate the correlation matrix: <code>matrix = df.corr()</code>.",
+                    "Print <code>matrix</code>.",
+                    "Extract the specific correlation value between Meditation and Power (it should be 1.0)."
+                ],
+                initialCode: "# Tracing the threads of fate...\n\n",
+                success: "The connection is absolute. As Meditation rises, Power rises equally. You have learned to see the invisible threads that bind the world together.",
+                validate: (pyodide, output) => {
+                    let errors = []; let passed = true; let feedback = "";
+                    
+                    if (output.includes("1.0") || output.includes("1.000000")) {
+                        feedback += "✓ [PASS] Perfect correlation detected (1.0).\n";
+                    } else {
+                        errors.push("✗ [FAIL] You did not print the correlation matrix showing 1.0.");
+                        passed = false;
+                    }
+
+                    return { passed, errors, feedback };
+                }
+            },
+            23: {
+                title: "BOSS BATTLE: The High Priestess",
+                description: "The Priestess scatters torn scrolls on the floor. 'All is chaos,' she whispers. 'There is no pattern.'<br><br><strong>Mission Objectives:</strong><br>1. Create a DataFrame with this raw data:<br>&nbsp;&nbsp;&nbsp;<code>{\"Mana\": [10, 40, 80, np.nan], \"Spell\": [5, 20, 40, 10]}</code><br>2. <strong>Clean</strong> the data by removing the row with <code>np.nan</code> using <code>.dropna()</code>.<br>3. Calculate the <strong>Correlation</strong> between 'Mana' and 'Spell'. Save the value to <code>link</code>.<br>4. <strong>Visualize</strong> the truth: Plot <code>plt.plot(df['Mana'], df['Spell'])</code>.<br>5. <strong>Prove it:</strong> If <code>link > 0.9</code>, print <code>\"Order Restored\"</code>.",
+                tasks: [
+                    "Import <code>pandas</code>, <code>numpy</code>, and <code>matplotlib.pyplot</code>.",
+                    "Create the DataFrame <code>df</code> with the messy data.",
+                    "Update <code>df</code> by running <code>df = df.dropna()</code>.",
+                    "Calculate the correlation of the clean data. Save the specific value to <code>link</code>.",
+                    "Plot 'Mana' (x) vs 'Spell' (y) and <code>plt.show()</code>.",
+                    "Write an if-statement: If <code>link > 0.9</code>, print \"Order Restored\"."
+                ],
+                initialCode: "# The High Priestess awaits your proof...\n\n",
+                success: "The High Priestess gasps as the scattered scrolls align. The line on your chart is straight and true. You have proven that even in a broken world, there is a connection between things. You are ready for the Prophecies.",
+                validate: (pyodide, output) => {
+                    let df = pyodide.globals.get('df');
+                    let link = pyodide.globals.get('link');
+                    let errors = []; let passed = true; let feedback = "";
+
+                    // 1. Check Imports & Plot (Source Check)
+                    let source = document.getElementById("code-editor").value;
+                    if (!source.includes("plt.plot") || !source.includes("plt.show")) {
+                        errors.push("✗ [FAIL] You must draw the chart to convince her.");
+                        passed = false;
+                    }
+
+                    // 2. Check Data Cleaning
+                    if (df) {
+                         let shape = df.shape; 
+                         let rows = shape.get(0);
+                         if (rows === 3) {
+                             feedback += "✓ [PASS] You successfully removed the broken scroll (NaN).\n";
+                         } else {
+                             errors.push("✗ [FAIL] The DataFrame still has " + rows + " rows. Did you use df.dropna()?");
+                             passed = false;
+                         }
+                    } else {
+                        errors.push("✗ [FAIL] DataFrame 'df' is missing.");
+                        passed = false;
+                    }
+
+                    // 3. Check Correlation Logic
+                    try {
+                        let linkVal = pyodide.runPython("float(link)");
+                        if (linkVal > 0.99) {
+                            feedback += "✓ [PASS] The correlation is perfect (1.0).\n";
+                        } else {
+                            errors.push("✗ [FAIL] The correlation is too low (" + linkVal + "). Did you clean the data first?");
+                            passed = false;
+                        }
+                    } catch (e) {
+                        errors.push("✗ [FAIL] Could not read variable 'link'.");
+                        passed = false;
+                    }
+
+                    // 4. Check Final Verdict
+                    if (output.includes("Order Restored")) {
+                        feedback += "✓ [PASS] You spoke the truth to power.\n";
+                    } else {
+                        errors.push("✗ [FAIL] Logic error. If link > 0.9, you must print 'Order Restored'.");
+                        passed = false;
+                    }
+
+                    return { passed, errors, feedback };
+                }
+            },
+            24: {
+                title: "Lesson 24: The Test of Two Steels",
+                description: "Two swordsmiths claim to forge the sharpest blade. The 'Masamune' feels lighter, but the 'Muramasa' cuts deeper. A master does not guess; they measure the cut.<br><br>Use the <strong>T-Test</strong> to see if the difference is real (Significant) or just chance.<br>If <strong>P-Value < 0.05</strong>, the difference is real.",
+                tasks: [
+                    "Import <code>ttest_ind</code> from <code>scipy.stats</code>.",
+                    "Define sharpness scores: <code>masamune = [85, 88, 86, 87, 85]</code>.",
+                    "Define sharpness scores: <code>muramasa = [95, 96, 94, 95, 97]</code>.",
+                    "Compare them: <code>stat, p_val = ttest_ind(masamune, muramasa)</code>.",
+                    "Print <code>p_val</code>.",
+                    "If <code>p_val < 0.05</code>, print <code>\"A true difference exists\"</code>."
+                ],
+                initialCode: "# Comparing the steel of legends...\n\n",
+                success: "The test is complete. The P-Value reveals that the difference is not a coincidence. The Muramasa is truly the sharper blade. You have learned to separate reputation from reality.",
+                validate: (pyodide, output) => {
+                    let p = pyodide.globals.get('p_val');
+                    let errors = []; let passed = true; let feedback = "";
+
+                    let source = document.getElementById("code-editor").value;
+                    if (!source.includes("ttest_ind")) {
+                        errors.push("✗ [FAIL] You must import 'ttest_ind' from scipy.stats.");
+                        passed = false;
+                    }
+
+                    try {
+                        p = Number(p); 
+                        if (p < 0.05 && p >= 0.0) {
+                            feedback += "✓ [PASS] P-Value calculated correctly (" + p.toExponential(4) + ").\n";
+                        } else {
+                            errors.push("✗ [FAIL] P-Value is wrong. Check your data lists.");
+                            passed = false;
+                        }
+                    } catch(e) {
+                         errors.push("✗ [FAIL] Variable 'p_val' is missing.");
+                         passed = false;
+                    }
+
+                    if (output.toLowerCase().includes("true difference")) {
+                        feedback += "✓ [PASS] You correctly identified the statistical significance.\n";
+                    } else {
+                        errors.push("✗ [FAIL] The P-value is small (< 0.05), so you should print 'A true difference exists'.");
+                        passed = false;
+                    }
+
+                    return { passed, errors, feedback };
+                }
+            },
+            25: {
+                title: "Lesson 25: The Archer's Zen",
+                description: "A novice watches the arrow fly. A master knows where it lands before drawing the string. <br><br>We use <strong>Linear Regression</strong> to predict the impact based on the draw weight. <br>1. <code>from sklearn.linear_model import LinearRegression</code><br>2. <code>model = LinearRegression()</code><br>3. <code>model.fit(X, y)</code> (Meditate on the pattern)<br>4. <code>model.predict(new_X)</code> (Foresee the outcome)",
+                tasks: [
+                    "Import <code>LinearRegression</code> from <code>sklearn.linear_model</code>.",
+                    "Training Data (Draw Weight): <code>draw = [[10], [20], [30]]</code> (Must be 2D array).",
+                    "Target Data (Distance): <code>dist = [100, 200, 300]</code>.",
+                    "Initialize and <code>fit</code> the model with <code>draw</code> and <code>dist</code>.",
+                    "Predict the distance for a 40kg draw: <code>prediction = model.predict([[40]])</code>.",
+                    "Print <code>prediction</code>."
+                ],
+                initialCode: "# Foreseeing the path of the arrow...\n\n",
+                success: "The arrow lands exactly where you predicted. You did not need to see it fly; the pattern of the universe (the Slope) guided your mind. This is the Zen of Regression.",
+                validate: (pyodide, output) => {
+                    let errors = []; let passed = true; let feedback = "";
+                    let val = null;
+
+                    try {
+                        // ROBUST FIX: Force Python to extract the scalar value from the array
+                        // prediction[0] gets the number inside the array.
+                        // float(...) converts it to a standard number.
+                        val = pyodide.runPython("float(prediction[0])");
+                    } catch (e) {
+                        errors.push("✗ [FAIL] Could not read 'prediction'. Did you assign the prediction to it?");
+                        passed = false;
+                    }
+
+                    if (passed) {
+                        if (Math.abs(val - 400) < 1.0) {
+                             feedback += "✓ [PASS] Vision confirmed. Predicted Distance: " + val + "m.\n";
+                        } else {
+                             errors.push("✗ [FAIL] Prediction wrong. Expected 400, got " + val + ".");
+                             passed = false;
+                        }
+                    }
+
+                    return { passed, errors, feedback };
+                }
+            },
+            26: {
+                title: "Lesson 26: The Essence of the Mantra",
+                description: "The students are chanting, but their voices are a blur. To understand the spirit of the dojo, you must deconstruct their words into pure numbers.<br><br>This is <strong>NLP</strong>. We use <strong>CountVectorizer</strong> to turn mantras into a matrix of word counts.",
+                tasks: [
+                    "Import <code>CountVectorizer</code> from <code>sklearn.feature_extraction.text</code>.",
+                    "The Logbook: <code>mantras = [\"Focus on the blade\", \"Focus on the breath\"]</code>.",
+                    "Initialize: <code>vectorizer = CountVectorizer()</code>.",
+                    "Transform the text: <code>X = vectorizer.fit_transform(mantras)</code>.",
+                    "Print the core words found: <code>print(vectorizer.get_feature_names_out())</code>."
+                ],
+                initialCode: "# Listening to the collective voice...\n\n",
+                success: "The blur of voices resolves into clarity. You see 'Blade', 'Breath', and 'Focus' not as sounds, but as quantifiable pillars of the dojo's spirit. You have captured the essence.",
+                validate: (pyodide, output) => {
+                    let vectorizer = pyodide.globals.get('vectorizer');
+                    let errors = []; let passed = true; let feedback = "";
+
+                    // Check for key words in output
+                    let outLower = output.toLowerCase();
+                    if (outLower.includes("blade") && outLower.includes("breath") && outLower.includes("focus")) {
+                        feedback += "✓ [PASS] The vocabulary was extracted successfully.\n";
+                    } else {
+                        errors.push("✗ [FAIL] You did not print the feature names (vocabulary).");
+                        passed = false;
+                    }
+
+                    let X = pyodide.globals.get('X');
+                    if(X) {
+                        feedback += "✓ [PASS] Mantras vectorized into matrix.\n";
+                    } else {
+                        errors.push("✗ [FAIL] You didn't save the prediction to 'X'.");
+                        passed = false;
+                    }
+
+                    return { passed, errors, feedback };
+                }
+            },
+            27: {
+                title: "Lesson 27: The Shadow at the Gate",
+                description: "A silhouette stands at the Dojo gate. Friend or Foe? A novice guesses; a Seer calculates.<br><br>We use <strong>Logistic Regression</strong> for Classification (Yes/No).<br>1. <code>from sklearn.linear_model import LogisticRegression</code><br>2. <code>model = LogisticRegression()</code><br>3. <code>model.fit(X, y)</code> (0=Friend, 1=Enemy)<br>4. <code>model.predict(new_X)</code>",
+                tasks: [
+                    "Import <code>LogisticRegression</code> from <code>sklearn.linear_model</code>.",
+                    "Training Data (Sword Length, Anger):<br><code>X = [[10, 1], [15, 2], [50, 9], [60, 10]]</code>",
+                    "Labels: <code>y = [0, 0, 1, 1]</code> (0=Friend, 1=Enemy).",
+                    "Fit the model on <code>X</code> and <code>y</code>.",
+                    "A stranger arrives with a long sword (45) and high anger (8). Predict their allegiance: <code>model.predict([[45, 8]])</code>.",
+                    "Save result to <code>threat</code> and print it."
+                ],
+                initialCode: "# A stranger approaches through the mist...\n\n",
+                success: "Your mind is sharper than any blade. The model analyzed the stranger's features and instantly recognized the pattern of an enemy. You have raised the alarm before the first blow was struck.",
+                validate: (pyodide, output) => {
+                    let errors = []; let passed = true; let feedback = "";
+                    let threatVal = null;
+
+                    try {
+                        // Nuclear Fix: Unwrap the numpy array to get the integer (0 or 1)
+                        threatVal = pyodide.runPython("int(threat[0])");
+                    } catch (e) {
+                        errors.push("✗ [FAIL] Could not read 'threat'. Did you predict using double brackets [[...]]?");
+                        passed = false;
+                    }
+
+                    if (passed) {
+                        if (threatVal === 1) {
+                            feedback += "✓ [PASS] Threat Detected (Class 1: Enemy).\n";
+                        } else {
+                            errors.push("✗ [FAIL] Prediction wrong. Expected 1 (Enemy), got " + threatVal + " (Friend).");
+                            passed = false;
+                        }
+                    }
+
+                    return { passed, errors, feedback };
+                }
+            },
+            28: {
+                title: "Lesson 28: The Constellations of War",
+                description: "Warriors are camped in the valley below. They hide their banners, but their positions betray them. They are clustered into two distinct clans.<br><br>We use <strong>K-Means Clustering</strong> to find hidden groups.<br>1. <code>from sklearn.cluster import KMeans</code><br>2. <code>kmeans = KMeans(n_clusters=2)</code><br>3. <code>kmeans.fit(X)</code><br>4. Labels are found in <code>kmeans.labels_</code>",
+                tasks: [
+                    "Import <code>KMeans</code> from <code>sklearn.cluster</code>.",
+                    "Campfire coordinates (X, Y):<br><code>camps = [[1, 2], [2, 1], [10, 10], [12, 11]]</code>",
+                    "Initialize <code>kmeans</code> to find 2 clusters.",
+                    "Fit the model to the <code>camps</code>.",
+                    "Print the <code>kmeans.labels_</code> to reveal the clan allegiance of each camp."
+                ],
+                initialCode: "# Mapping the invisible factions...\n\n",
+                success: "The chaos of the battlefield resolves into order. You see what others miss: two distinct armies waiting in the dark. You have grouped the clans without ever seeing their faces.",
+                validate: (pyodide, output) => {
+                    let errors = []; let passed = true; let feedback = "";
+                    let labels = pyodide.globals.get('kmeans');
+
+                    // Check if they printed the labels array (e.g., [0 0 1 1] or [1 1 0 0])
+                    if (output.includes("[") && output.includes("]")) {
+                         // Simple heuristic check
+                         feedback += "✓ [PASS] The clan labels have been revealed.\n";
+                    } else {
+                        errors.push("✗ [FAIL] You must print the 'kmeans.labels_' array.");
+                        passed = false;
+                    }
+
+                    if (labels) {
+                        try {
+                             // Check if the model was actually trained
+                             let n_clusters = pyodide.runPython("kmeans.n_clusters");
+                             if (n_clusters === 2) {
+                                 feedback += "✓ [PASS] Model configured for 2 clans.\n";
+                             }
+                        } catch(e) {}
+                    }
+
+                    return { passed, errors, feedback };
+                }
+            },
+            29: {
+                title: "FINAL BOSS: The Grandmaster's Prophecy",
+                description: "The Grandmaster descends from his throne. He holds a single, ancient scroll. 'I have recorded every battle of this Dojo for fifty years,' he says. 'Troops, Morale, and Victory. But I cannot see the pattern. You must finish what I began.'<br><br><strong>The Mission:</strong><br>1. <strong>Receive the Scroll:</strong> Create the DataFrame:<br>&nbsp;&nbsp;&nbsp;<code>{\"Troops\": [10, 100, 50, 10, np.nan], \"Morale\": [5, 90, 40, 5, 20], \"Win\": [0, 1, 1, 0, 0]}</code><br>2. <strong>Restore the Ink:</strong> Remove the damaged record (NaN) with <code>.dropna()</code>.<br>3. <strong>See the Past:</strong> Plot <code>Troops</code> vs <code>Morale</code>.<br>4. <strong>Train the Mind:</strong> Train a <code>LogisticRegression</code> model (X=Troops/Morale, y=Win).<br>5. <strong>Predict the Future:</strong> An enemy approaches with <strong>60 Troops</strong> and <strong>50 Morale</strong>. Will we win (1) or lose (0)?",
+                tasks: [
+                    "Import <code>pandas</code>, <code>numpy</code>, <code>matplotlib.pyplot</code>, and <code>LogisticRegression</code>.",
+                    "Create the <code>df</code> with the Grandmaster's data.",
+                    "Clean the data: <code>df = df.dropna()</code>.",
+                    "Visualize the history: <code>plt.scatter(df[\"Troops\"], df[\"Morale\"])</code> and <code>plt.show()</code>.",
+                    "Define features <code>X = df[[\"Troops\", \"Morale\"]]</code> and target <code>y = df[\"Win\"]</code>.",
+                    "Train the model: <code>model.fit(X, y)</code>.",
+                    "Predict the final battle: <code>prediction = model.predict([[60, 50]])</code>.",
+                    "If <code>prediction == 1</code>, print <code>\"Victory is Assured\"</code>. Else print <code>\"Defeat is Certain\"</code>."
+                ],
+                initialCode: "# The Grandmaster hands you the scroll...\n\n",
+                success: "<strong>CONGRATULATIONS!</strong><br><br>The Grandmaster bows to YOU. You have done what no one else could. You took the raw history of the Dojo, cleaned it of errors, found the hidden patterns, and used them to save the realm.<br><br>You are no longer a student. You are a Data Scientist. The Dojo is yours.",
+                validate: (pyodide, output) => {
+                    let df = pyodide.globals.get('df');
+                    let prediction = pyodide.globals.get('prediction');
+                    let errors = []; let passed = true; let feedback = "";
+
+                    // 1. Check Data Cleaning
+                    if (df) {
+                         if (df.shape.get(0) === 4) {
+                             feedback += "✓ [PASS] Historical records cleaned (NaN removed).\n";
+                         } else {
+                             errors.push("✗ [FAIL] The data is dirty. Did you use df.dropna()?");
+                             passed = false;
+                         }
+                    } else {
+                        errors.push("✗ [FAIL] DataFrame 'df' is missing.");
+                        passed = false;
+                    }
+
+                    // 2. Check Visualization (Source Code Check)
+                    let source = document.getElementById("code-editor").value;
+                    if (source.includes("plt.scatter") || source.includes("plt.plot")) {
+                        feedback += "✓ [PASS] The battlefield map has been drawn.\n";
+                    } else {
+                        errors.push("✗ [FAIL] You must visualize the data (plt.scatter).");
+                        passed = false;
+                    }
+
+                    // 3. Check Prediction
+                    try {
+                        let predVal = pyodide.runPython("int(prediction[0])");
+                        if (predVal === 1) {
+                            feedback += "✓ [PASS] Prediction Model: SUCCESS (1).\n";
+                        } else {
+                            errors.push("✗ [FAIL] The model predicts Defeat (0). Check your training data or cleaning.");
+                            passed = false;
+                        }
+                    } catch (e) {
+                        errors.push("✗ [FAIL] Could not read 'prediction'. Did you predict using [[...]]?");
+                        passed = false;
+                    }
+
+                    // 4. Final Verdict
+                    if (output.includes("Victory is Assured")) {
+                        feedback += "✓ [PASS] Prophecy Spoken.\n";
+                    } else {
+                        errors.push("✗ [FAIL] You must print 'Victory is Assured' if prediction is 1.");
+                        passed = false;
+                    }
+
+                    return { passed, errors, feedback };
+                }
+            },
+            30: {
+                title: "Epilogue: The New Grandmaster",
+                description: "The war is over. The realm is safe. <br><br>You began as a wanderer who did not know a <code>Variable</code> from a <code>String</code>. You mastered the <strong>Katana of Logic</strong> (Loops/Functions), built the <strong>Castles of Objects</strong> (Classes), and finally unlocked the <strong>Oracle's Vision</strong> (Data Science & ML).<br><br>The Grandmaster steps down. The Dojo is looking for a new leader.<br><br><strong>Final Task:</strong> Sign your name to the Register of Masters.",
+                tasks: [
+                    "Create a variable <code>name</code> with your actual name (string).",
+                    "Print the oath: <code>print(f\"I, {name}, accept the title of Grandmaster.\")</code>"
+                ],
+                initialCode: "# The Golden Book lies open before you...\n\nname = \"Student\"\n",
+                success: "It is written. The prophecy is fulfilled. You are the Master now.",
+                validate: (pyodide, output) => {
+                    let name = pyodide.globals.get('name');
+                    let errors = []; let passed = true; let feedback = "";
+
+                    // 1. Check Name
+                    if (!name || name === "Student") {
+                        errors.push("✗ [FAIL] You must sign your own name, not 'Student'.");
+                        passed = false;
+                    }
+
+                    // 2. Check Oath
+                    if (output.includes("accept the title")) {
+                        feedback += "✓ [PASS] The Oath has been spoken.\n";
+                    } else {
+                        errors.push("✗ [FAIL] You must print the exact oath.");
+                        passed = false;
+                    }
+                    
+                    // 3. GENERATE THE CERTIFICATE
+                    if (passed) {
+                        let date = new Date().toLocaleDateString();
+                        
+                        let svgContent = `
+                        <svg width="1100" height="750" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 750">
+                            <defs>
+                                <!-- Tatami texture -->
+                                <pattern id="tatami" patternUnits="userSpaceOnUse" width="60" height="60">
+                                    <rect width="60" height="60" fill="#fdfbf7"/>
+                                    <line x1="0" y1="0" x2="0" y2="60" stroke="#f2ede3" stroke-width="1"/>
+                                    <line x1="0" y1="30" x2="60" y2="30" stroke="#f2ede3" stroke-width="0.5"/>
+                                    <line x1="30" y1="0" x2="30" y2="60" stroke="#f2ede3" stroke-width="0.3" opacity="0.5"/>
+                                </pattern>
+                                
+                                <!-- Wood grain gradients -->
+                                <linearGradient id="darkWood" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#4a2f1a;stop-opacity:1" />
+                                    <stop offset="30%" style="stop-color:#5c3a21;stop-opacity:1" />
+                                    <stop offset="70%" style="stop-color:#5c3a21;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#4a2f1a;stop-opacity:1" />
+                                </linearGradient>
+                                
+                                <linearGradient id="mediumWood" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#7a5230;stop-opacity:1" />
+                                    <stop offset="50%" style="stop-color:#8b5a2b;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#7a5230;stop-opacity:1" />
+                                </linearGradient>
+                                
+                                <!-- Subtle paper texture -->
+                                <filter id="paperTexture">
+                                    <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" result="noise"/>
+                                    <feDiffuseLighting in="noise" lighting-color="#f5f0e8" surfaceScale="1">
+                                        <feDistantLight azimuth="45" elevation="60"/>
+                                    </feDiffuseLighting>
+                                </filter>
+                                
+                                <!-- Elegant shadow for text -->
+                                <filter id="softShadow">
+                                    <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+                                    <feOffset dx="1" dy="2" result="offsetblur"/>
+                                    <feComponentTransfer>
+                                        <feFuncA type="linear" slope="0.2"/>
+                                    </feComponentTransfer>
+                                    <feMerge>
+                                        <feMergeNode/>
+                                        <feMergeNode in="SourceGraphic"/>
+                                    </feMerge>
+                                </filter>
+                                
+                                <!-- Seal gradient -->
+                                <radialGradient id="sealGlow">
+                                    <stop offset="0%" style="stop-color:#d4793c;stop-opacity:0.2"/>
+                                    <stop offset="100%" style="stop-color:#d4793c;stop-opacity:0"/>
+                                </radialGradient>
+                            </defs>
+                            
+                            <!-- Background -->
+                            <rect width="100%" height="100%" fill="url(#tatami)" />
+                            
+                            <!-- Outer dark wood frame -->
+                            <rect x="20" y="20" width="1060" height="710" fill="url(#darkWood)" rx="4"/>
+                            
+                            <!-- Middle lighter wood frame -->
+                            <rect x="32" y="32" width="1036" height="686" fill="url(#mediumWood)" rx="3"/>
+                            
+                            <!-- Inner paper area -->
+                            <rect x="45" y="45" width="1010" height="660" fill="#fdfbf7"/>
+                            <rect x="45" y="45" width="1010" height="660" fill="url(#paperTexture)" opacity="0.03"/>
+                            
+                            <!-- Corner ornaments - back in actual corners -->
+                            <g stroke="#d4793c" stroke-width="3" fill="none" opacity="0.5" stroke-linecap="round">
+                                <!-- Top left -->
+                                <path d="M 90,90 L 90,150 M 90,90 L 150,90"/>
+                                <circle cx="90" cy="90" r="4" fill="#d4793c"/>
+                                
+                                <!-- Top right -->
+                                <path d="M 1010,90 L 1010,150 M 1010,90 L 950,90"/>
+                                <circle cx="1010" cy="90" r="4" fill="#d4793c"/>
+                                
+                                <!-- Bottom left -->
+                                <path d="M 90,660 L 90,600 M 90,660 L 150,660"/>
+                                <circle cx="90" cy="660" r="4" fill="#d4793c"/>
+                                
+                                <!-- Bottom right -->
+                                <path d="M 1010,660 L 1010,600 M 1010,660 L 950,660"/>
+                                <circle cx="1010" cy="660" r="4" fill="#d4793c"/>
+                            </g>
+                            
+                            <!-- Elegant enso circle behind title -->
+                            <circle cx="550" cy="145" r="50" fill="none" stroke="#d4793c" stroke-width="6" opacity="0.12" 
+                                    stroke-dasharray="240 75" stroke-linecap="round" transform="rotate(-95 550 145)"/>
+                            
+                            <!-- Title section - smaller to avoid corners -->
+                            <text x="550" y="138" font-family="'Noto Serif JP', 'Cinzel', 'Playfair Display', Georgia, serif" 
+                                font-size="48" font-weight="700" text-anchor="middle" fill="#3d2817" letter-spacing="7"
+                                filter="url(#softShadow)">
+                                CERTIFICATE OF MASTERY
+                            </text>
+                            
+                            <text x="550" y="172" font-family="'Noto Serif JP', Georgia, serif" font-size="17" 
+                                text-anchor="middle" fill="#8b5a2b" letter-spacing="9" font-weight="500">
+                                道場 • PYTHON DOJO
+                            </text>
+                            
+                            <!-- Decorative divider -->
+                            <g opacity="0.45">
+                                <line x1="300" y1="207" x2="535" y2="207" stroke="#d4793c" stroke-width="2.5"/>
+                                <circle cx="550" cy="207" r="5" fill="#d4793c"/>
+                                <line x1="565" y1="207" x2="800" y2="207" stroke="#d4793c" stroke-width="2.5"/>
+                            </g>
+                            
+                            <!-- Certification text - perfectly centered -->
+                            <text x="550" y="290" font-family="'Noto Serif JP', Georgia, serif" font-size="26" 
+                                text-anchor="middle" fill="#3d2817" font-weight="400">
+                                This scroll certifies that
+                            </text>
+                            
+                            <!-- NAME - Exquisite typography, perfectly centered -->
+                            <text x="550" y="385" font-family="'Noto Serif JP', 'Playfair Display', 'Palatino Linotype', Georgia, serif" 
+                                font-weight="700" font-size="72" text-anchor="middle" fill="#2a2520" letter-spacing="4"
+                                filter="url(#softShadow)">
+                                ${name}
+                            </text>
+                            
+                            <!-- Achievement lines - perfectly centered -->
+                            <text x="550" y="450" font-family="'Noto Serif JP', Georgia, serif" font-size="24" 
+                                text-anchor="middle" fill="#3d2817" font-weight="400">
+                                has walked the Path of Code and emerged victorious
+                            </text>
+                            
+                            <text x="550" y="488" font-family="'Noto Serif JP', Georgia, serif" font-size="21" 
+                                text-anchor="middle" fill="#6b4423" font-style="italic" font-weight="400">
+                                Master of Python, Logic, and Data
+                            </text>
+                            
+                            <!-- Skills badge - even wider for more space -->
+                            <rect x="130" y="528" width="840" height="60" rx="12" fill="#f9f6f0" 
+                                stroke="#d4793c" stroke-width="3" opacity="0.85"/>
+                            <rect x="130" y="528" width="840" height="60" rx="12" 
+                                fill="url(#mediumWood)" opacity="0.04"/>
+                                
+                            <text x="550" y="566" font-family="'Fira Code', 'Consolas', 'Monaco', monospace" 
+                                font-size="15" font-weight="700" text-anchor="middle" fill="#6b4423" letter-spacing="4">
+                                PYTHON • PANDAS • NUMPY • VISUALIZATION • MACHINE LEARNING
+                            </text>
+                            
+                            <!-- Bottom section - all perfectly aligned and centered -->
+                            
+                            <!-- Date (left third) -->
+                            <g>
+                                <text x="275" y="625" font-family="'Noto Serif JP', Georgia, serif" font-size="20" 
+                                    text-anchor="middle" fill="#3d2817" font-weight="500">
+                                    ${date}
+                                </text>
+                                <line x1="195" y1="637" x2="355" y2="637" stroke="#6b4423" stroke-width="2.5" stroke-linecap="round"/>
+                                <text x="275" y="658" font-family="Arial, sans-serif" font-size="11" 
+                                    text-anchor="middle" fill="#8b5a2b" letter-spacing="4" font-weight="600">
+                                    DATE
+                                </text>
+                            </g>
+                            
+                            <!-- Seal (center) - perfectly centered at x=550 -->
+                            <circle cx="550" cy="625" r="50" fill="url(#sealGlow)"/>
+                            <circle cx="550" cy="625" r="42" fill="none" stroke="#d4793c" stroke-width="3.5"/>
+                            <circle cx="550" cy="625" r="35" fill="none" stroke="#d4793c" stroke-width="2" opacity="0.4"/>
+                            <circle cx="550" cy="625" r="28" fill="none" stroke="#d4793c" stroke-width="1.5" opacity="0.3"/>
+                            <text x="550" y="643" font-size="48" text-anchor="middle">🌸</text>
+                            
+                            <!-- Signature (right third) -->
+                            <g>
+                                <text x="825" y="625" font-family="'Brush Script MT', 'Lucida Handwriting', 'Zapfino', cursive" 
+                                    font-size="34" text-anchor="middle" fill="#3d2817">
+                                    The Grandmaster
+                                </text>
+                                <line x1="745" y1="637" x2="905" y2="637" stroke="#6b4423" stroke-width="2.5" stroke-linecap="round"/>
+                                <text x="825" y="658" font-family="Arial, sans-serif" font-size="11" 
+                                    text-anchor="middle" fill="#8b5a2b" letter-spacing="4" font-weight="600">
+                                    SIGNATURE
+                                </text>
+                            </g>
+                            
+                            <!-- Subtle bamboo accent marks -->
+                            <g opacity="0.1" fill="#7c9473">
+                                <rect x="100" y="160" width="3" height="60" rx="1.5"/>
+                                <rect x="108" y="170" width="3" height="50" rx="1.5"/>
+                                <rect x="116" y="165" width="3" height="55" rx="1.5"/>
+                                
+                                <rect x="981" y="160" width="3" height="60" rx="1.5"/>
+                                <rect x="989" y="170" width="3" height="50" rx="1.5"/>
+                                <rect x="997" y="165" width="3" height="55" rx="1.5"/>
+                            </g>
+                        </svg>
+                        `;
+
+                        // Convert SVG to Base64
+                        let base64Svg = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgContent)));
+
+                        // Create Modal
+                        let modalId = "cert-modal";
+                        let existingModal = document.getElementById(modalId);
+                        if(existingModal) existingModal.remove();
+
+                        let modal = document.createElement("div");
+                        modal.id = modalId;
+                        modal.style.position = "fixed";
+                        modal.style.top = "0";
+                        modal.style.left = "0";
+                        modal.style.width = "100%";
+                        modal.style.height = "100%";
+                        modal.style.backgroundColor = "rgba(42, 37, 32, 0.96)";
+                        modal.style.zIndex = "10000";
+                        modal.style.display = "flex";
+                        modal.style.flexDirection = "column";
+                        modal.style.alignItems = "center";
+                        modal.style.justifyContent = "center";
+                        modal.style.backdropFilter = "blur(10px)";
+                        modal.style.animation = "fadeIn 0.5s ease-out";
+                        
+                        // Add keyframe animation
+                        if (!document.getElementById('modal-styles')) {
+                            let style = document.createElement('style');
+                            style.id = 'modal-styles';
+                            style.textContent = `
+                                @keyframes fadeIn {
+                                    from { opacity: 0; }
+                                    to { opacity: 1; }
+                                }
+                                @keyframes slideUp {
+                                    from { transform: translateY(40px); opacity: 0; }
+                                    to { transform: translateY(0); opacity: 1; }
+                                }
+                                @keyframes glow {
+                                    0%, 100% { box-shadow: 0 25px 100px rgba(0,0,0,0.9), 0 0 80px rgba(212, 121, 60, 0.3); }
+                                    50% { box-shadow: 0 30px 120px rgba(0,0,0,0.95), 0 0 100px rgba(212, 121, 60, 0.5); }
+                                }
+                            `;
+                            document.head.appendChild(style);
+                        }
+                        
+                        modal.innerHTML = `
+                            <div style="text-align: center; margin-bottom: 40px; animation: slideUp 0.6s ease-out;">
+                                <h2 style="color: #fdfbf7; font-family: 'Noto Serif JP', serif; margin: 0 0 15px 0; 
+                                        font-size: 2.5rem; letter-spacing: 4px; font-weight: 700; text-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+                                    🏯 The Ceremony is Complete
+                                </h2>
+                                <p style="color: #d4c5a0; font-family: 'Noto Serif JP', serif; font-size: 1.15rem; 
+                                        letter-spacing: 1.5px; margin: 0; font-weight: 400;">
+                                    Right-click the certificate below and select "Save Image As..."
+                                </p>
+                            </div>
+                            <div style="animation: slideUp 0.9s ease-out; display: flex; justify-content: center; align-items: center;">
+                                <img src="${base64Svg}" 
+                                    style="border: 12px solid #6b4423; 
+                                            animation: glow 3s ease-in-out infinite;
+                                            max-width: 92%; max-height: 72vh; 
+                                            background: white; 
+                                            border-radius: 8px;
+                                            display: block;">
+                            </div>
+                            <button onclick="document.getElementById('${modalId}').remove()" 
+                                    style="margin-top: 40px; padding: 18px 50px; font-size: 20px; cursor: pointer; 
+                                        background: linear-gradient(135deg, #d4793c 0%, #b85c28 100%); 
+                                        color: #fdfbf7; border: none; border-radius: 8px; 
+                                        font-family: 'Noto Serif JP', serif; font-weight: 700; letter-spacing: 4px;
+                                        box-shadow: 0 10px 30px rgba(212, 121, 60, 0.6), inset 0 1px 0 rgba(255,255,255,0.2);
+                                        transition: all 0.3s ease; animation: slideUp 1.2s ease-out;
+                                        text-transform: uppercase;">
+                                Close Ceremony
+                            </button>
+                        `;
+                        
+                        // Add hover effect to button
+                        let btn = modal.querySelector('button');
+                        btn.onmouseenter = () => {
+                            btn.style.transform = 'translateY(-4px) scale(1.02)';
+                            btn.style.boxShadow = '0 15px 40px rgba(212, 121, 60, 0.7), inset 0 1px 0 rgba(255,255,255,0.3)';
+                        };
+                        btn.onmouseleave = () => {
+                            btn.style.transform = 'translateY(0) scale(1)';
+                            btn.style.boxShadow = '0 10px 30px rgba(212, 121, 60, 0.6), inset 0 1px 0 rgba(255,255,255,0.2)';
+                        };
+                        btn.onclick = () => {
+                            modal.style.animation = 'fadeIn 0.3s ease-out reverse';
+                            setTimeout(() => modal.remove(), 300);
+                        };
+                        
+                        document.body.appendChild(modal);
+                        feedback += "The Certificate has been presented to you.";
+                    }
+
+                    return { passed, errors, feedback };
+                }
+            }
+        };
+
+        // --- SYSTEM CORE ---
+        let currentLevel = 1;
+
+        // 1. Define the Setup Function (Loads Python + Libraries)
+        async function setupPyodide() {
+            let pyodide = await loadPyodide(); // Load base Python
+            
+            // Load the heavy machinery for Act 2 & 3
+            console.log("📥 Loading Imperial Archives (Numpy, Pandas, Matplotlib)...");
+            await pyodide.loadPackage(["numpy", "pandas", "matplotlib"]);
+            console.log("📥 Loading the Seer's Tools (Scipy, Sklearn)...");
+            await pyodide.loadPackage(["scipy", "scikit-learn"]);
+            console.log("✅ Archives Loaded.");
+            
+            return pyodide;
+        }
+
+        // 2. Initialize using the new Setup Function
+        let pyodideReadyPromise = setupPyodide();
+
+        // 3. UI Stuff (Quotes)
+        pyodideReadyPromise.then(() => {
+            displayRandomQuote();
+            console.log("Sensei is ready.");
+        });
+
+        function toggleModal(show) {
+            document.getElementById('rules-modal').style.display = show ? 'flex' : 'none';
+        }
+
+        // --- SAVE/LOAD SYSTEM ---
+        function saveProgress() {
+            const code = document.getElementById("code-editor").value;
+            localStorage.setItem(`dojo_code_${currentLevel}`, code);
+            const status = document.getElementById("save-status");
+            status.innerText = "Saved";
+            setTimeout(() => { status.innerText = ""; }, 1000);
+        }
+
+        function markLevelComplete(levelId) {
+            localStorage.setItem(`dojo_complete_${levelId}`, "true");
+            updateDropdownUI();
+        }
+
+        function resetProgress() {
+            if(confirm("Are you sure?")) {
+                // Only remove keys starting with "dojo_"
+                Object.keys(localStorage).forEach(key => {
+                    if (key.startsWith("dojo_")) {
+                        localStorage.removeItem(key);
+                    }
+                });
+                window.history.pushState(null, "", window.location.pathname);
+                location.reload();
             }
         }
-        main();
+
+        function updateDropdownUI() {
+            const select = document.getElementById("level-select");
+            select.innerHTML = ""; 
+            Object.keys(LEVELS).forEach(levelId => {
+                const isComplete = localStorage.getItem(`dojo_complete_${levelId}`) === "true";
+                const checkmark = isComplete ? "✓ " : "";
+                const option = document.createElement("option");
+                option.value = levelId;
+                option.text = `${checkmark}Level ${levelId}: ${LEVELS[levelId].title.split(':')[1]}`;
+                if (parseInt(levelId) === currentLevel) option.selected = true;
+                select.appendChild(option);
+            });
+        }
+
+        function changeLevel(levelId) {
+            currentLevel = parseInt(levelId);
+            // Update URL without reload
+            const newUrl = window.location.pathname + "?level=" + currentLevel;
+            window.history.pushState({path: newUrl}, '', newUrl);
+            loadLevelUI();
+        }
+
+        function goToNextLevel() {
+            if (LEVELS[currentLevel + 1]) {
+                currentLevel++;
+                changeLevel(currentLevel);
+            } else {
+                alert("You have mastered all existing scrolls! Check back later for more training.");
+            }
+        }
+
+        function loadLevelUI() {
+            const levelData = LEVELS[currentLevel];
+            
+            // New Quote on Level Change
+            displayRandomQuote();
+
+            // Hide next button when loading a new level
+            document.getElementById("next-level-container").style.display = "none";
+            document.getElementById("btn-submit").style.display = "inline-block";
+
+            let taskList = levelData.tasks.map(t => `<li>${t}</li>`).join("");
+            document.getElementById("lesson-content").innerHTML = `
+                <h3>${levelData.title}</h3>
+                <p>${levelData.description}</p>
+                <ul>${taskList}</ul>
+            `;
+            
+            const savedCode = localStorage.getItem(`dojo_code_${currentLevel}`);
+            document.getElementById("code-editor").value = savedCode !== null ? savedCode : levelData.initialCode;
+            
+            updateDropdownUI();
+            
+            document.getElementById("console-output").className = "ink-output";
+            document.getElementById("console-output").innerText = "Awaiting your code...";
+        }
+
+        async function checkCode() {
+            let outputDiv = document.getElementById("console-output");
+            outputDiv.innerHTML = "🧘 Sensei is contemplating...";
+            outputDiv.className = "ink-output";
+            
+            saveProgress();
+
+            let pyodide = await pyodideReadyPromise;
+            let userCode = document.getElementById("code-editor").value;
+
+            try {
+                // 1. Reset Environment
+                pyodide.runPython("globals().clear()");
+                
+                // 2. Setup Input/Output Capture AND Plotting Capture
+                // We define a dummy plt.show() so the user's code doesn't clear the plot before we grab it.
+                pyodide.runPython(`
+import sys
+import matplotlib.pyplot as plt
+from io import StringIO
+
+# Capture Text Output
+sys.stdout = StringIO()
+
+# Mock plt.show to prevent it from clearing the figure immediately
+def show_mock():
+    pass
+plt.show = show_mock
+                `);
+
+                // 3. Run User Code
+                await pyodide.runPythonAsync(userCode);
+
+                // 4. Extract Text Output
+                let stdout = pyodide.runPython("sys.stdout.getvalue()");
+
+                // 5. Extract Image Output
+                let imageHTML = "";
+                // Check if user actually tried to plot something in their code
+                // This prevents empty boxes in text-only levels
+                let sourceCode = document.getElementById("code-editor").value;
+                let userTriedPlotting = sourceCode.includes("plt.") || sourceCode.includes(".plot(");
+
+                let hasPlot = pyodide.runPython("len(plt.get_fignums()) > 0");
+                
+                if (hasPlot && userTriedPlotting) {
+                    pyodide.runPython(`
+import io, base64
+buf = io.BytesIO()
+plt.savefig(buf, format='png')
+buf.seek(0)
+img_str = base64.b64encode(buf.read()).decode('utf-8')
+plt.clf() # Clear the figure
+plt.close('all') # Force close all figures
+                    `);
+                    let imgStr = pyodide.globals.get('img_str');
+                    imageHTML = `<br><br><div style="text-align:center; background:white; padding:10px; border-radius:4px;"><img src="data:image/png;base64,${imgStr}" style="max-width:100%; border:1px solid #ccc;"></div>`;
+                } else {
+                    // If a plot exists but the user didn't ask for it (ghost plot), kill it.
+                    pyodide.runPython("plt.clf(); plt.close('all')");
+                }
+                
+                // 6. Validate
+                let result = LEVELS[currentLevel].validate(pyodide, stdout);
+                let feedback = "═══ YOUR OUTPUT ═══\n" + stdout;
+                
+                // Append the image to the feedback area
+                if(imageHTML) {
+                    feedback += imageHTML; 
+                }
+                
+                feedback += "\n";
+
+                if(result.passed) {
+                    let victoryMsg = LEVELS[currentLevel].success || "Excellent. You have mastered this technique.";
+                    feedback += "\n═══ SENSEI'S WORDS ═══\n" + result.feedback + "\n" + victoryMsg;
+                    outputDiv.className = "ink-output status-pass";
+                    markLevelComplete(currentLevel);
+                    
+                    if (LEVELS[currentLevel + 1]) {
+                        document.getElementById("next-level-container").style.display = "block";
+                        document.getElementById("btn-submit").style.display = "none"; 
+                    } else {
+                        feedback += "\n\n(You have completed all available levels!)";
+                    }
+
+                } else {
+                    feedback += "\n" + result.errors.join("\n");
+                    feedback += "\n\n═══ SENSEI'S WORDS ═══\nFocus. Correct your stance and try again.";
+                    outputDiv.className = "ink-output status-fail";
+                }
+                
+                // Use innerHTML instead of innerText to render the <img> tag
+                outputDiv.innerHTML = feedback.replace(/\n/g, '<br>');
+
+            } catch (err) {
+                outputDiv.className = "ink-output status-fail";
+                outputDiv.innerText = "═══ SYNTAX ERROR ═══\n" + err;
+            }
+        }
+
+        // Initialize on Load
+        window.onload = function() {
+            // 1. Load the correct level based on URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const levelParam = urlParams.get('level');
+            
+            if (levelParam && LEVELS[levelParam]) {
+                currentLevel = parseInt(levelParam);
+            } else {
+                currentLevel = 1;
+            }
+            
+            loadLevelUI();
+
+            // 2. KEYBOARD SHORTCUTS
+            document.getElementById('code-editor').addEventListener('keydown', function(e) {
+                
+                // TAB KEY: Insert 4 spaces
+                if (e.key == 'Tab') {
+                    e.preventDefault();
+                    var start = this.selectionStart;
+                    var end = this.selectionEnd;
+
+                    this.value = this.value.substring(0, start) +
+                        "    " + this.value.substring(end);
+
+                    this.selectionStart = this.selectionEnd = start + 4;
+                    saveProgress();
+                }
+
+                // CTRL + ENTER: Run Code
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault(); 
+                    
+                    let btn = document.getElementById('btn-submit');
+                    
+                    // Only run if the button is actually visible
+                    if (btn.style.display !== 'none') {
+                        // Visual Feedback (Animate Press)
+                        btn.style.transform = "translateY(2px)";
+                        btn.style.boxShadow = "0 2px 10px rgba(212, 121, 60, 0.4), inset 0 1px 0 rgba(255,255,255,0.2)";
+                        
+                        setTimeout(() => { 
+                            // Reset styles
+                            btn.style.transform = "translateY(0)"; 
+                            btn.style.boxShadow = ""; 
+                        }, 150);
+
+                        // Trigger the actual click
+                        // This ensures the behavior matches the mouse click exactly
+                        btn.click();
+                    }
+                }
+            });
+        };
     </script>
 </body>
 </html>
